@@ -2,6 +2,7 @@
 #define DATABASE_H
 
 #include <string>
+#include <list>
 #include "Member.h"
 #include "Sanction.h"
 #include "Transaction.h"
@@ -14,6 +15,7 @@ private:
     bool ok_;
     char* err_;
     sqlite3* cx_;
+    sqlite3_stmt* ptr;
 
 public:
 
@@ -21,7 +23,15 @@ public:
     ~Database(){ if(ok_) sqlite3_close(cx_);};
     
     void printHelp();
-    void query(std::string target, std::string field, std::string filter);
+
+    void idQuery(Book &target, int id);
+    void idQuery(Transaction &target, int id);
+    void idQuery(Member &target, int id);
+    void idQuery(Sanction &target, int id);
+    void query(std::list<Book> &target, std::string field, std::string filter, bool partialMatch);
+    void query(std::list<Transaction> &target, std::string field, std::string filter, bool partialMatch);
+    void query(std::list<Member> &target, std::string field, std::string filter, bool partialMatch);
+    void query(std::list<Sanction> &target, std::string field, std::string filter, bool partialMatch);
 
     Book insertOrUpdate(const Book &book);
     Transaction insertOrUpdate(const Transaction &transaction);

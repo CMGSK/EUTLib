@@ -18,14 +18,14 @@ public:
 
     Transaction();
     Transaction(int bookId, int memberId, std::string transactionDate, std::string dueDate, std::string returningDate):
-    bookId_(bookId), memberId_(memberId), transactionDate_(transactionDate), dueDate_(dueDate), returningDate_(returningDate), isReturned_(false)
+    id_(-1), bookId_(bookId), memberId_(memberId), transactionDate_(transactionDate), dueDate_(dueDate), returningDate_(returningDate), isReturned_(false)
     {};
     Transaction(int id, int bookId, int memberId):
     id_(id), bookId_(bookId), memberId_(memberId)
     {};
     
 
-    void markAsReturned();
+    void markAsReturned() {isReturned_ = true;};
     int getId() const {return id_;};
     int getBookId() const {return bookId_;};
     int getMemberId() const {return memberId_;};
@@ -33,6 +33,15 @@ public:
     std::string getDueDate () const {return dueDate_;};
     std::string getReturningDate() const {return returningDate_;};
     int getIsReturned() const {return isReturned_;};
+
+    void setId(int n);
+    void setBookId(int n);
+    void setMemberId(int n);
+    void setTransactionDate(std::string s);
+    void setDueDate(std::string s);
+    void setReturningDate(std::string s);
+    void setIsReturned(bool b);
+    
 
 };
 
