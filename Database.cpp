@@ -6,6 +6,7 @@
 #include "Database.h"
 #include "Book.h"
 #include "Member.h"
+#include "Sanction.h"
 #include "Transaction.h"
 
 static const std::string sql = "CREATE TABLE IF NOT EXISTS Books (" \
@@ -110,8 +111,8 @@ Member Database::insertOrUpdate(const Member &member){
     try{
         std::ostringstream os;
         os << "INSERT INTO Members (name, address, email, phone, active, restricted_until) VALUES (" 
-        << "'" << member.getName() << "',"
-        << "'" << member.getAddress() << "',"
+        << "'" << member.getName().c_str() << "',"
+        << "'" << member.getAddress().c_str() << "',"
         << "'" << member.getEmail().c_str() << "',"
         << "'" << member.getPhone().c_str() << "',"
         << "'" << member.getRestrictedUntil().c_str() << "');";
@@ -120,8 +121,27 @@ Member Database::insertOrUpdate(const Member &member){
             std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
         } else {
             result = *new Member(sqlite3_last_insert_rowid(cx_),
-                member.getBookId(),
-                member.getMemberId());
+                member.getName());
+        }
+    } catch (...) { return result; }
+    return result;
+}
+
+Sanction Database::insertOrUpdate(const Sanction &sanction){
+    Sanction result;
+    //Insertion
+    try{
+        std::ostringstream os;
+        os << "INSERT INTO Sanctions (member_id, end_of_sanction, is_active) VALUES (" 
+        << "'" << sanction.getMemberId() << "',"
+        << "'" << sanction.getEndOfSanction().c_str() << "',"
+        << "'" << sanction.getIsActive() << "');";
+        if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
+            std::cout << os.str() << std::endl;
+            std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+        } else {
+            result = *new Sanction(sqlite3_last_insert_rowid(cx_),
+                sanction.getName());
         }
     } catch (...) { return result; }
     return result;

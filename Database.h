@@ -3,17 +3,20 @@
 
 #include <string>
 #include "Member.h"
+#include "Sanction.h"
 #include "Transaction.h"
 #include "Book.h"
 #include "sqlite3.h"
 
 class Database {
 private:
+
     bool ok_;
     char* err_;
     sqlite3* cx_;
 
 public:
+
     Database();
     ~Database(){ if(ok_) sqlite3_close(cx_);};
     
@@ -23,15 +26,11 @@ public:
     Book insertOrUpdate(const Book &book);
     Transaction insertOrUpdate(const Transaction &transaction);
     Member insertOrUpdate(const Member &member);
-    // bool insertOrUpdate();
-    // bool insertOrUpdate();
-    // bool insertOrUpdate();
+    Sanction insertOrUpdate(const Sanction &sanction);
     bool deleteFromDB(const Book &book);
     bool deleteFromDB(const Transaction &transaction);
     bool deleteFromDB(const Member &memeber);
-    // bool delete();
-    // bool delete();
-    // bool delete();
+    bool deleteFromDB(const Sanction &sanction);
 
 };
 
