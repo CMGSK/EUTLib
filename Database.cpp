@@ -5,6 +5,8 @@
 #include <sstream>
 #include "Database.h"
 #include "Book.h"
+#include "Member.h"
+#include "Transaction.h"
 
 static const std::string sql = "CREATE TABLE IF NOT EXISTS Books (" \
             "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
@@ -38,7 +40,6 @@ static const std::string sql = "CREATE TABLE IF NOT EXISTS Books (" \
 
 
 Database::Database(): err_(0), ok_(true){
-
     if (sqlite3_open("library.db", &cx_)){
         std::cout << sqlite3_errmsg(cx_) << std::endl;
         ok_ = false;
@@ -46,19 +47,19 @@ Database::Database(): err_(0), ok_(true){
     }
     std::cout << "Successful connection." << std::endl;
 
-
     if (sqlite3_exec(cx_, sql.c_str(), NULL, 0, &err_)){
         std::cout << sqlite3_errmsg(cx_) << std::endl;
         ok_ = false;
     } else {
         std::cout << "Tables created." << std::endl;
     }
-
     
 }
 
 
-bool Database::insertOrUpdateBook(const Book &book){
+Book Database::insertOrUpdate(const Book &book){
+    Book result;
+    //Insertion
     try{
         std::ostringstream os;
         os << "INSERT INTO Books (title, author, genre, ISBN, year, available) VALUES (" 
@@ -66,12 +67,62 @@ bool Database::insertOrUpdateBook(const Book &book){
         << "'" << book.getAuthor().c_str() << "',"
         << "'" << book.getGenre().c_str() << "',"
         << "'" << book.getISBN().c_str() << "',"
-        << book.getYear() << ","
-        << book.getAvailable() << ");";
+        << "'" << book.getYear() << ","
+        << "'" << book.getAvailable() << ");";
         if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
             std::cout << os.str() << std::endl;
-            std::cout << "ha fallao tio mejora -->" << sqlite3_errmsg(cx_) << std::endl;
+            std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+        } else {
+            result = *new Book(sqlite3_last_insert_rowid(cx_),
+                book.getTitle(),
+                book.getISBN());
         }
-    } catch (...) { return false; }
-    return true;
+    } catch (...) { return result; }
+    return result;
+}
+
+Transaction Database::insertOrUpdate(const Transaction &transaction){
+    Transaction result;
+    //Insertion
+    try{
+        std::ostringstream os;
+        os << "INSERT INTO Transactions (book_id, member_id, transaction_date, due_date, returning_date, is_returned) VALUES (" 
+        << "'" << transaction.getBookId() << "',"
+        << "'" << transaction.getMemberId() << "',"
+        << "'" << transaction.getTransactionDate().c_str() << "',"
+        << "'" << transaction.getDueDate().c_str() << "',"
+        << "'" << transaction.getReturningDate().c_str() << "');";
+        if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
+            std::cout << os.str() << std::endl;
+            std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+        } else {
+            result = *new Transaction(sqlite3_last_insert_rowid(cx_),
+                transaction.getBookId(),
+                transaction.getMemberId());
+        }
+    } catch (...) { return result; }
+    return result;
+}
+
+Member Database::insertOrUpdate(const Member &member){
+    Member result;
+    //Insertion
+    try{
+        std::ostringstream os;
+        os << "INSERT INTO Members (name, address, email, phone, active, restricted_until) VALUES (" 
+        << "'" << member.getName() << "',"
+        << "'" << member.getAddress() << "',"
+        << "'" << member.getEmail().c_str() << "',"
+        << "'" << member.getPhone().c_str() << "',"
+        << "'" << member.getRestrictedUntil().c_str() << "');";
+        if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
+            std::cout << os.str() << std::endl;
+            std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+        } else {
+            result = *new Member(sqlite3_last_insert_rowid(cx_),
+                member.getBookId(),
+                member.getMemberId());
+        }
+    } catch (...) { return result; }
+    return result;
 }

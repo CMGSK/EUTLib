@@ -13,13 +13,17 @@ private:
     std::string ISBN_;
     int year_;
     int available_;
-
-
+    bool inDB_;
 
 public:
 
     Book();
-    Book(std::string title, std::string ISBN, int available):title_(title), author_("null"), genre_("null"), ISBN_(ISBN), year_(0), available_(available){};
+    Book(std::string title, std::string ISBN, int available):
+    title_(title), author_("null"), genre_("null"), ISBN_(ISBN), year_(0), available_(available)
+    {};
+    Book(int id, std::string title, std::string ISBN):
+    id_(id), title_(title), ISBN_(ISBN), inDB_(true)
+    {};
 
     void setTitle(std::string s);
     void setAuthor(std::string s);
@@ -36,6 +40,7 @@ public:
     std::string getISBN() const {return ISBN_;};
     int getYear() const {return year_;};
     int getAvailable() const {return available_;};
+
 };
 
 #endif
