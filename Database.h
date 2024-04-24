@@ -24,23 +24,15 @@ public:
     
     void printHelp();
 
-    void idQuery(Book &target, int id);
-    void idQuery(Transaction &target, int id);
-    void idQuery(Member &target, int id);
-    void idQuery(Sanction &target, int id);
-    void query(std::list<Book> &target, std::string field, std::string filter, bool partialMatch);
-    void query(std::list<Transaction> &target, std::string field, std::string filter, bool partialMatch);
-    void query(std::list<Member> &target, std::string field, std::string filter, bool partialMatch);
-    void query(std::list<Sanction> &target, std::string field, std::string filter, bool partialMatch);
+    void query(std::list<void*> &target, std::string from, std::string filter, std::string value, bool partialMatch, bool isTotal);
 
     Book insertOrUpdate(const Book &book);
     Transaction insertOrUpdate(const Transaction &transaction);
     Member insertOrUpdate(const Member &member);
     Sanction insertOrUpdate(const Sanction &sanction);
-    bool deleteFromDB(const Book &book);
-    bool deleteFromDB(const Transaction &transaction);
-    bool deleteFromDB(const Member &memeber);
-    bool deleteFromDB(const Sanction &sanction);
+
+    bool deleteSingle(std::string table, int id);
+    bool deleteBulk(std::string table, int id[], int arrSize);
 
 };
 

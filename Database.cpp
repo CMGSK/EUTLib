@@ -1,7 +1,12 @@
 #include <iostream>
+#include <iterator>
+#include <list>
 #include <sqlite3.h>
 #include <sstream>
+#include <string>
+
 #include "Database.h"
+#include "Commands.h"
 #include "Book.h"
 #include "Member.h"
 #include "Sanction.h"
@@ -54,92 +59,157 @@ Database::Database(): err_(0), ok_(true){
     }
 }
 
+void Database::printHelp(){
+    std::cout << "These are the available commands:" << std::endl;
+    std::cout << "(Type 'quit' to exit from the program anytime)" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "Command to insert:" << std::endl;
+    std::cout << "\t ins [-flag]" << std::endl;
+    std::cout << "Flags:" << std::endl;
+    std::cout << "\t [-b] for books" << std::endl;
+    std::cout << "\t [-m] for members" << std::endl;
+    std::cout << "\t [-t] for transactions" << std::endl;
+    std::cout << "\t [-s] for sanctions" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "Command to delete:" << std::endl;
+    std::cout << "\t del [-flag]" << std::endl;
+    std::cout << "Flags:" << std::endl;
+    std::cout << "\t [-b] for books" << std::endl;
+    std::cout << "\t [-m] for members" << std::endl;
+    std::cout << "\t [-t] for transactions" << std::endl;
+    std::cout << "\t [-s] for sanctions" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "Command to update:" << std::endl;
+    std::cout << "\t mod [-flag]" << std::endl;
+    std::cout << "Flags:" << std::endl;
+    std::cout << "\t [-b] for books" << std::endl;
+    std::cout << "\t [-m] for members" << std::endl;
+    std::cout << "\t [-t] for transactions" << std::endl;
+    std::cout << "\t [-s] for sanctions" << std::endl;
+    std::cout << "" << std::endl;
+    std::cout << "Command to select:" << std::endl;
+    std::cout << "\t sel [-flag]" << std::endl;
+    std::cout << "Flags:" << std::endl;
+    std::cout << "\t [-a] use it to avoid filter input (select all)" << std::endl;
+    std::cout << "\t   ---------------------   " << std::endl;
+    std::cout << "\t [-b] for books" << std::endl;
+    std::cout << "\t [-m] for members" << std::endl;
+    std::cout << "\t [-t] for transactions" << std::endl;
+    std::cout << "\t [-s] for sanctions" << std::endl;
+    std::cout << "\t [-s] for sanctions" << std::endl;
+}
+
+//Deletes
+bool Database::deleteSingle(std::string table, int id){
+    std::ostringstream os;
+    os << "DELETE FROM " << table << " WHERE id = " << id;
+
+    if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
+        std::cout << os.str() << std::endl;
+        std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+        return false;
+    } else return true;
+}
+
+bool Database::deleteBulk(std::string table, int id[], int arrSize){
+    std::ostringstream os;
+    os << "DELETE FROM " << table << " WHERE id IN ( ";
+    for (int i=0; i<arrSize; i++){
+        os << id[i] << (i == arrSize-1 ? ")" : ",");
+    }
+
+    if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
+        std::cout << os.str() << std::endl;
+        std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+        return false;
+    } else return true;
+}
+
 //Selects
-void Database::idQuery (Book &target, int id){
+void Database::query(std::list<void*> &target, std::string from, std::string filter, std::string value, bool partialMatch, bool isTotal){
+
     std::ostringstream os;
-    os << "SELECT * from Books WHERE id = " << id;
+    if (!isTotal) {
+        os << "SELECT * from " << from << " WHERE " << filter << (partialMatch ? " LIKE '%" : "='") << value << (partialMatch ? "%'" : "'");
+    } else {
+        os << "SELECT * FROM " << from;
+    }
 
     if(sqlite3_prepare_v2(cx_, sql.c_str(), -1, &ptr, NULL)){
         std::cout << sqlite3_errmsg(cx_) << std::endl;
         return;
     }
 
-    if (sqlite3_step(ptr) == SQLITE_ROW){
-        target.setId(sqlite3_column_int(ptr, 0));
-        target.setTitle(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 1)));
-        target.setAuthor(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 2)));
-        target.setGenre(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 3)));
-        target.setYear(sqlite3_column_int(ptr, 4));
-        target.setAvailable(sqlite3_column_int(ptr, 5));
-    } else {
-        std::cout << sqlite3_errmsg(cx_) << std::endl << "No books with such ID" << std::endl;
+    try{
+        switch (from_case.at(from)) {
+            case 0: {
+                while (sqlite3_step(ptr) == SQLITE_ROW){
+                    void* temp;
+                    Book* book = new Book();
+                    book->setId(sqlite3_column_int(ptr, 0));
+                    book->setTitle(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 1)));
+                    book->setAuthor(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 2)));
+                    book->setGenre(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 3)));
+                    book->setYear(sqlite3_column_int(ptr, 4));
+                    book->setAvailable(sqlite3_column_int(ptr, 5));
+                    temp = book;
+                    target.push_back(temp);
+                }
+                return;
+            }
+            case 1: {
+                while (sqlite3_step(ptr) == SQLITE_ROW){
+                    void* temp;
+                    Member* member = new Member();
+                    member->setId(sqlite3_column_int(ptr, 0));
+                    member->setName(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 1)));
+                    member->setAddress(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 2)));
+                    member->setEmail(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 3)));
+                    member->setPhone(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 4)));
+                    member->setRestriction(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 5)));
+                    member->setActive(sqlite3_column_int(ptr, 6));
+                    temp = member;
+                    target.push_back(temp);
+                }
+                return;
+            }
+            case 2: {
+                while (sqlite3_step(ptr) == SQLITE_ROW){
+                    void* temp;
+                    Transaction* transaction = new Transaction();
+                    transaction->setId(sqlite3_column_int(ptr, 0));
+                    transaction->setBookId(sqlite3_column_int(ptr, 1));
+                    transaction->setMemberId(sqlite3_column_int(ptr, 2));
+                    transaction->setTransactionDate(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 3)));
+                    transaction->setDueDate(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 4)));
+                    transaction->setReturningDate(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 5)));
+                    transaction->setIsReturned(sqlite3_column_int(ptr, 6));
+                    temp = transaction;
+                    target.push_back(temp);
+                }
+                return;
+            }
+            case 3: {
+                while (sqlite3_step(ptr) == SQLITE_ROW){
+                    void* temp;
+                    Sanction* sanction = new Sanction();
+                    sanction->setId(sqlite3_column_int(ptr, 0));
+                    sanction->setMemberId(sqlite3_column_int(ptr, 1));
+                    sanction->setEndOfSanction(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 2)));
+                    sanction->setIsActive(sqlite3_column_int(ptr, 3));
+                    temp = sanction;
+                    target.push_back(temp);
+                }
+                return;
+            }
+        }
+    } catch (...) { 
+        std::cout << "table does not exist" << std::endl;     
+        return; 
     }
 }
 
-void Database::idQuery (Transaction &target, int id){
-    std::ostringstream os;
-    os << "SELECT * from Transactions WHERE id = " << id;
-
-    if(sqlite3_prepare_v2(cx_, sql.c_str(), -1, &ptr, NULL)){
-        std::cout << sqlite3_errmsg(cx_) << std::endl;
-        return;
-    }
-
-    if (sqlite3_step(ptr) == SQLITE_ROW){
-        target.setId(sqlite3_column_int(ptr, 0));
-        target.setBookId(sqlite3_column_int(ptr, 1));
-        target.setMemberId(sqlite3_column_int(ptr, 2));
-        target.setTransactionDate(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 3)));
-        target.setDueDate(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 4)));
-        target.setReturningDate(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 5)));
-        target.setIsReturned(sqlite3_column_int(ptr, 6));
-    } else {
-        std::cout << sqlite3_errmsg(cx_) << std::endl << "No transactions with such ID" << std::endl;
-    }
-}
-
-void Database::idQuery (Member &target, int id){
-    std::ostringstream os;
-    os << "SELECT * from Members WHERE id = " << id;
-
-    if(sqlite3_prepare_v2(cx_, sql.c_str(), -1, &ptr, NULL)){
-        std::cout << sqlite3_errmsg(cx_) << std::endl;
-        return;
-    }
-
-    if (sqlite3_step(ptr) == SQLITE_ROW){
-        target.setId(sqlite3_column_int(ptr, 0));
-        target.setName(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 1)));
-        target.setAddress(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 2)));
-        target.setEmail(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 3)));
-        target.setPhone(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 4)));
-        target.setRestriction(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 5)));
-        target.setActive(sqlite3_column_int(ptr, 6));
-    } else {
-        std::cout << sqlite3_errmsg(cx_) << std::endl << "No members with such ID" << std::endl;
-    }
-}
-
-void Database::idQuery (Sanction &target, int id){
-    std::ostringstream os;
-    os << "SELECT * from Sanctions WHERE id = " << id;
-
-    if(sqlite3_prepare_v2(cx_, sql.c_str(), -1, &ptr, NULL)){
-        std::cout << sqlite3_errmsg(cx_) << std::endl;
-        return;
-    }
-
-    if (sqlite3_step(ptr) == SQLITE_ROW){
-        target.setId(sqlite3_column_int(ptr, 0));
-        target.setMemberId(sqlite3_column_int(ptr, 1));
-        target.setEndOfSanction(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 2)));
-        target.setIsActive(sqlite3_column_int(ptr, 3));
-    } else {
-        std::cout << sqlite3_errmsg(cx_) << std::endl << "No sanctions with such ID" << std::endl;
-    }
-}
-
-
+// Inserts or Updates
 Book Database::insertOrUpdate(const Book &book){
     Book result;
     //Update only logically editable and non-unique fields
@@ -160,9 +230,12 @@ Book Database::insertOrUpdate(const Book &book){
                 std::cout << os.str() << std::endl;
                 std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
             } else {
-                result = *new Book(sqlite3_last_insert_rowid(cx_),
-                    book.getTitle(),
-                    book.getISBN());
+                //TODO: rewrite to use vectors then ask the fucking baldman how to cast void* into Obj
+                int id = sqlite3_last_insert_rowid(cx_);
+                std::list<void*> r;
+                query(r, "books", "id", std::to_string(id), false, false);
+                void* temp = r.begin();
+                result = reinterpret_cast<Book*>(temp)
             }
         } catch (...) { return result; }
         return result;
