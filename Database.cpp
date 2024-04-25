@@ -147,8 +147,8 @@ bool Database::deleteBulk(std::string table, std::vector<int> id){
 }
 
 //Selects
+/*
 void Database::query(std::vector<std::shared_ptr<LibraryRepository>> &target, std::string from, std::string filter, std::string value, bool partialMatch, bool isTotal){
-
     std::ostringstream os;
     os << "SELECT * FROM " << from;
     if (!isTotal) os << " WHERE " << filter << (partialMatch ? " LIKE '%" : "='") << value << (partialMatch ? "%'" : "'");
@@ -218,6 +218,7 @@ void Database::query(std::vector<std::shared_ptr<LibraryRepository>> &target, st
         return; 
     }
 }
+*/
 
 // Inserts and Updates
 Book Database::insertOrUpdate(const Book &book){
@@ -242,8 +243,8 @@ Book Database::insertOrUpdate(const Book &book){
             } else {
                 int id = book.getId();
                 std::vector<std::shared_ptr<LibraryRepository>> r;
-                query(r, "books", "id", std::to_string(id), false, false);
-                return *std::static_pointer_cast<Book>(r[0]);
+                // query(r, "books", "id", std::to_string(id), false, false);
+                // return *std::static_pointer_cast<Book>(r[0]);
             }
         } catch (...) { return result; }
         return result;
@@ -264,8 +265,8 @@ Book Database::insertOrUpdate(const Book &book){
         } else {
             int id = sqlite3_last_insert_rowid(cx_);
             std::vector<std::shared_ptr<LibraryRepository>> r;
-            query(r, "books", "id", std::to_string(id), false, false);
-            return *std::static_pointer_cast<Book>(r[0]);
+            // query(r, "books", "id", std::to_string(id), false, false);
+            // return *std::static_pointer_cast<Book>(r[0]);
         }
     } catch (...) { return result; }
     return result;
@@ -295,8 +296,8 @@ Transaction Database::insertOrUpdate(const Transaction &transaction){
             } else {
                 int id = transaction.getId();
                 std::vector<std::shared_ptr<LibraryRepository>> r;
-                query(r, "transactions", "id", std::to_string(id), false, false);
-                return *std::static_pointer_cast<Transaction>(r[0]);
+                // query(r, "transactions", "id", std::to_string(id), false, false);
+                // return *std::static_pointer_cast<Transaction>(r[0]);
             }
         } catch (...) { return result; }
         return result;
@@ -316,8 +317,8 @@ Transaction Database::insertOrUpdate(const Transaction &transaction){
         } else {
             int id = sqlite3_last_insert_rowid(cx_);
             std::vector<std::shared_ptr<LibraryRepository>> r;
-            query(r, "transactions", "id", std::to_string(id), false, false);
-            return *std::static_pointer_cast<Transaction>(r[0]);
+            // query(r, "transactions", "id", std::to_string(id), false, false);
+            // return *std::static_pointer_cast<Transaction>(r[0]);
         }
     } catch (...) { return result; }
     return result;
@@ -349,8 +350,8 @@ Member Database::insertOrUpdate(const Member &member){
             } else {
                 int id = member.getId();
                 std::vector<std::shared_ptr<LibraryRepository>> r;
-                query(r, "transactions", "id", std::to_string(id), false, false);
-                return *std::static_pointer_cast<Member>(r[0]);
+                // query(r, "transactions", "id", std::to_string(id), false, false);
+                // return *std::static_pointer_cast<Member>(r[0]);
             }
         } catch (...) { return result; }
         return result;
@@ -370,8 +371,8 @@ Member Database::insertOrUpdate(const Member &member){
         } else {
             int id = sqlite3_last_insert_rowid(cx_);
             std::vector<std::shared_ptr<LibraryRepository>> r;
-            query(r, "sanctions", "id", std::to_string(id), false, false);
-            return *std::static_pointer_cast<Member>(r[0]);
+            // query(r, "sanctions", "id", std::to_string(id), false, false);
+            // return *std::static_pointer_cast<Member>(r[0]);
         }
     } catch (...) { return result; }
     return result;
@@ -393,8 +394,8 @@ Sanction Database::insertOrUpdate(const Sanction &sanction){
             } else {
                 int id = sanction.getId();
                 std::vector<std::shared_ptr<LibraryRepository>> r;
-                query(r, "transactions", "id", std::to_string(id), false, false);
-                return *std::static_pointer_cast<Sanction>(r[0]);
+                // query(r, "transactions", "id", std::to_string(id), false, false);
+                // return *std::static_pointer_cast<Sanction>(r[0]);
             }
         } catch (...) { return result; }
         return result;
@@ -412,8 +413,8 @@ Sanction Database::insertOrUpdate(const Sanction &sanction){
         } else {
             int id = sqlite3_last_insert_rowid(cx_);
             std::vector<std::shared_ptr<LibraryRepository>> r;
-            query(r, "transactions", "id", std::to_string(id), false, false);
-            return *std::static_pointer_cast<Sanction>(r[0]);
+            // query(r, "transactions", "id", std::to_string(id), false, false);
+            // return *std::static_pointer_cast<Sanction>(r[0]);
         }
     } catch (...) { return result; }
     return result;

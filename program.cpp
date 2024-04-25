@@ -70,7 +70,7 @@ void selectionPath(Database* db, std::string command, bool isTotal){
             case 0: {
                 if(isTotal){
                     std::vector<std::shared_ptr<LibraryRepository>> r;
-                    db->query(r, "books", "", "", false, true);
+                    // db->query(r, "books", "", "", false, true);
                     if (r.empty()) std::cout << "No results." << std::endl;
                     for(auto item : r)
                         std::static_pointer_cast<Book>(item)->toString();
@@ -89,7 +89,7 @@ void selectionPath(Database* db, std::string command, bool isTotal){
                     std::cout << "Do you want to include partial matches? (Y/N): ";
                     std::cin >> partialMatch;
 
-                    db->query(r, "books", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
+                    // db->query(r, "books", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
                     if (r.empty()) std::cout << "No results." << std::endl;
 
                     for(auto item : r)
@@ -99,7 +99,7 @@ void selectionPath(Database* db, std::string command, bool isTotal){
             case 1: {
                 if(isTotal){
                     std::vector<std::shared_ptr<LibraryRepository>> r;
-                    db->query(r, "members", "", "", false, true);
+                    // db->query(r, "members", "", "", false, true);
                     if (r.empty()) std::cout << "No results." << std::endl;
                     for(auto item : r)
                         std::static_pointer_cast<Member>(item)->toString();
@@ -118,7 +118,7 @@ void selectionPath(Database* db, std::string command, bool isTotal){
                     std::cout << "Do you want to include partial matches? (Y/N): ";
                     std::cin >> partialMatch;
 
-                    db->query(r, "members", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
+                    // db->query(r, "members", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
                     if (r.empty()) std::cout << "No results." << std::endl;
 
                     for(auto item : r)
@@ -128,7 +128,7 @@ void selectionPath(Database* db, std::string command, bool isTotal){
             case 2: {
                 if(isTotal){
                     std::vector<std::shared_ptr<LibraryRepository>> r;
-                    db->query(r, "transactions", "", "", false, true);
+                    // db->query(r, "transactions", "", "", false, true);
                     if (r.empty()) std::cout << "No results." << std::endl;
                     for(auto item : r)
                         std::static_pointer_cast<Transaction>(item)->toString();
@@ -147,7 +147,7 @@ void selectionPath(Database* db, std::string command, bool isTotal){
                     std::cout << "Do you want to include partial matches? (Y/N): ";
                     std::cin >> partialMatch;
 
-                    db->query(r, "transactions", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
+                    // db->query(r, "transactions", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
                     if (r.empty()) std::cout << "No results." << std::endl;
 
                     for(auto item : r)
@@ -157,7 +157,7 @@ void selectionPath(Database* db, std::string command, bool isTotal){
             case 3: {
                 if(isTotal){
                     std::vector<std::shared_ptr<LibraryRepository>> r;
-                    db->query(r, "sanctions", "", "", false, true);
+                    // db->query(r, "sanctions", "", "", false, true);
                     if (r.empty()) std::cout << "No results." << std::endl;
                     for(auto item : r)
                         std::static_pointer_cast<Sanction>(item)->toString();
@@ -176,7 +176,7 @@ void selectionPath(Database* db, std::string command, bool isTotal){
                     std::cout << "Do you want to include partial matches? (Y/N): ";
                     std::cin >> partialMatch;
 
-                    db->query(r, "sanctions", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
+                    // db->query(r, "sanctions", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
 
                     for(auto item : r)
                         std::static_pointer_cast<Sanction>(item)->toString();

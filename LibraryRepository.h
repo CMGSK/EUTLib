@@ -107,10 +107,6 @@ public:
 
 };
 
-#include "LibraryRepository.h"
-#include <string>
-#include <sstream>
-
 class Book : public LibraryRepository{
 private: 
 
