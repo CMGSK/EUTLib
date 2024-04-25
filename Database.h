@@ -4,12 +4,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <sqlite3.h>
 #include "LibraryRepository.h"
-#include "Member.h"
-#include "Sanction.h"
-#include "Transaction.h"
-#include "Book.h"
-#include "sqlite3.h"
 
 class Database {
 private:
@@ -25,6 +21,7 @@ public:
     ~Database(){ if(ok_) sqlite3_close(cx_);};
     
     void printHelp();
+    void printAttr(std::string item);
 
     void query(std::vector<std::shared_ptr<LibraryRepository>> &target, std::string from, std::string filter, std::string value, bool partialMatch, bool isTotal);
 

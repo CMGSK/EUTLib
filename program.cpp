@@ -1,11 +1,9 @@
 #include "Database.h"
 #include "Commands.h"
-#include "Member.h"
-#include "Sanction.h"
-#include "Transaction.h"
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -26,7 +24,7 @@ int main() {
         try{
             std::string parse = parseCommand(command);
             std::string flag = parseCommand(command);
-            switch (command_case.at(flag)) { //TODO Slice at spacebar
+            switch (command_case.at(flag)) { 
                 case 0: {
                     db->printHelp();
                     break;
@@ -66,6 +64,128 @@ std::string parseCommand(char* &cmd){
     return parse;
 }
 
+void selectionPath(Database* db, std::string command, bool isTotal){
+    try{
+        switch (flag_case.at(command)) {
+            case 0: {
+                if(isTotal){
+                    std::vector<std::shared_ptr<LibraryRepository>> r;
+                    db->query(r, "books", "", "", false, true);
+                    if (r.empty()) std::cout << "No results." << std::endl;
+                    for(auto item : r)
+                        std::static_pointer_cast<Book>(item)->toString();
+                } 
+                else {
+                    std::vector<std::shared_ptr<LibraryRepository>> r;
+                    std::string filter;
+                    std::string value;
+                    char partialMatch;
+
+                    std::cout << "Type the the attribute you will look for:\n>";
+                    db->printAttr("books");
+                    std::cin >> filter;
+                    std::cout << "Type the the value you want to check\n>";
+                    std::cin >> value;
+                    std::cout << "Do you want to include partial matches? (Y/N): ";
+                    std::cin >> partialMatch;
+
+                    db->query(r, "books", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
+                    if (r.empty()) std::cout << "No results." << std::endl;
+
+                    for(auto item : r)
+                        std::static_pointer_cast<Book>(item)->toString();
+                }
+            }
+            case 1: {
+                if(isTotal){
+                    std::vector<std::shared_ptr<LibraryRepository>> r;
+                    db->query(r, "members", "", "", false, true);
+                    if (r.empty()) std::cout << "No results." << std::endl;
+                    for(auto item : r)
+                        std::static_pointer_cast<Member>(item)->toString();
+                } 
+                else {
+                    std::vector<std::shared_ptr<LibraryRepository>> r;
+                    std::string filter;
+                    std::string value;
+                    char partialMatch;
+
+                    std::cout << "Type the the attribute you will look for:\n>";
+                    db->printAttr("members");
+                    std::cin >> filter;
+                    std::cout << "Type the the value you want to check\n>";
+                    std::cin >> value;
+                    std::cout << "Do you want to include partial matches? (Y/N): ";
+                    std::cin >> partialMatch;
+
+                    db->query(r, "members", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
+                    if (r.empty()) std::cout << "No results." << std::endl;
+
+                    for(auto item : r)
+                        std::static_pointer_cast<Member>(item)->toString();
+                }
+            }
+            case 2: {
+                if(isTotal){
+                    std::vector<std::shared_ptr<LibraryRepository>> r;
+                    db->query(r, "transactions", "", "", false, true);
+                    if (r.empty()) std::cout << "No results." << std::endl;
+                    for(auto item : r)
+                        std::static_pointer_cast<Transaction>(item)->toString();
+                } 
+                else {
+                    std::vector<std::shared_ptr<LibraryRepository>> r;
+                    std::string filter;
+                    std::string value;
+                    char partialMatch;
+
+                    std::cout << "Type the the attribute you will look for:\n>";
+                    db->printAttr("transactions");
+                    std::cin >> filter;
+                    std::cout << "Type the the value you want to check\n>";
+                    std::cin >> value;
+                    std::cout << "Do you want to include partial matches? (Y/N): ";
+                    std::cin >> partialMatch;
+
+                    db->query(r, "transactions", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
+                    if (r.empty()) std::cout << "No results." << std::endl;
+
+                    for(auto item : r)
+                        std::static_pointer_cast<Transaction>(item)->toString();
+                }
+            }
+            case 3: {
+                if(isTotal){
+                    std::vector<std::shared_ptr<LibraryRepository>> r;
+                    db->query(r, "sanctions", "", "", false, true);
+                    if (r.empty()) std::cout << "No results." << std::endl;
+                    for(auto item : r)
+                        std::static_pointer_cast<Sanction>(item)->toString();
+                } 
+                else {
+                    std::vector<std::shared_ptr<LibraryRepository>> r;
+                    std::string filter;
+                    std::string value;
+                    char partialMatch;
+
+                    std::cout << "Type the the attribute you will look for:\n>";
+                    db->printAttr("sacntions");
+                    std::cin >> filter;
+                    std::cout << "Type the the value you want to check\n>";
+                    std::cin >> value;
+                    std::cout << "Do you want to include partial matches? (Y/N): ";
+                    std::cin >> partialMatch;
+
+                    db->query(r, "sanctions", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
+
+                    for(auto item : r)
+                        std::static_pointer_cast<Sanction>(item)->toString();
+                }
+            }
+        }
+    } catch (...) { std::cout << "Flag is not valid. If you need help, type -h."; }
+}
+
 void deletionPath(Database* db, std::string command){
     try{
         std::string input;
@@ -101,9 +221,7 @@ void deletionPath(Database* db, std::string command){
                 }
             }
         }
-    } catch (...) {
-        std::cout << "Flag is not valid. If you need help, type -h.";
-    }
+    } catch (...) { std::cout << "Flag is not valid. If you need help, type -h."; }
 }
 
 void insertionPath(Database* db, std::string command) {
@@ -129,7 +247,7 @@ void insertionPath(Database* db, std::string command) {
                 book->setAvailable(atoi(input.c_str()));
 
                 Book res = db->insertOrUpdate(*book);
-                std::cout << "-----> Book inserted\n" << res.toString() << std::endl;
+                std::cout << "-----> Book inserted\n\n" << res.toString() << std::endl;
                 return;
             }
             case 1: {
@@ -153,7 +271,7 @@ void insertionPath(Database* db, std::string command) {
                 member->setActive(true);
 
                 Member res = db->insertOrUpdate(*member);
-                std::cout << "-----> Member inserted\n" << res.toString() << std::endl;
+                std::cout << "-----> Member inserted\n\n" << res.toString() << std::endl;
             }
             case 2: {
                 Transaction* transaction = new Transaction();
@@ -181,7 +299,7 @@ void insertionPath(Database* db, std::string command) {
                 transaction->setIsReturned(false);
 
                 Transaction res = db->insertOrUpdate(*transaction);
-                std::cout << "-----> Member inserted\n" << res.toString() << std::endl;
+                std::cout << "-----> Transaction inserted.\n\n" << res.toString() << std::endl;
             }
             case 3: {
                 Sanction* sanction = new Sanction();
@@ -197,12 +315,10 @@ void insertionPath(Database* db, std::string command) {
                 sanction->setIsActive(false);
 
                 Sanction res = db->insertOrUpdate(*sanction);
-                std::cout << "-----> Member inserted\n" << res.toString() << std::endl;
+                std::cout << "-----> Sanction inserted\n\n" << res.toString() << std::endl;
             }
         }
-    } catch (...) {
-        std::cout << "Flag is not valid. If you need help, type -h.";
-    }
+    } catch (...) { std::cout << "Flag is not valid. If you need help, type -h."; }
 }
 
 void updatePath(Database* db, std::string command) {
@@ -315,7 +431,5 @@ void updatePath(Database* db, std::string command) {
                 std::cout << "-----> Member inserted\n" << res.toString() << std::endl;
             }
         }
-    } catch (...) {
-        std::cout << "Flag is not valid. If you need help, type -h.";
-    }
+    } catch (...) { std::cout << "Flag is not valid. If you need help, type -h."; }
 }
