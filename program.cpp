@@ -1,46 +1,67 @@
 #include "Database.h"
 #include "Commands.h"
 #include "Member.h"
+#include "Sanction.h"
 #include "Transaction.h"
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 
 void insertionPath(Database* db, std::string command);
+void deletionPath(Database* db, std::string command);
+void updatePath(Database* db, std::string command);
+void selectionPath(Database* db, std::string command, bool isTotal);
+std::string parseCommand(char* &command);
 
 int main() {
 
     Database* db = new Database();
     
-//TODOs: Parse commands. Implement to_string(). Implement getAttributes().
-// check if we can avoid double update/delete function with a void*
-
-    //Term program
-
     std::cout << "Insert a command. Type -h for help. \n> ";
     while(true){
         char* command;
         std::cin >> command;
         try{
-            switch (command_case.at(command)) { //TODO Slice at spacebar
-                case 0:
+            std::string parse = parseCommand(command);
+            std::string flag = parseCommand(command);
+            switch (command_case.at(flag)) { //TODO Slice at spacebar
+                case 0: {
                     db->printHelp();
                     break;
-                case 1:
-
-
-            
+                }
+                case 1: {
+                    insertionPath(db, flag);
+                    break;
+                }
+                case 2: {
+                    deletionPath(db, flag);
+                    break;
+                }
+                case 3: {
+                    updatePath(db, flag);
+                    break;
+                }
+                case 4: {
+                    selectionPath(db, flag, strcmp(command, "-a") == 0);
+                    break;
+                }
             }
-
         } catch (...) {
-            std::cout << "Invalid command. If you need help, type -h."
+            std::cout << "Invalid command. If you need help, type -h.";
         }
-
-
-
-         
-
     }
+
     return 0;
+}
+
+std::string parseCommand(char* &cmd){
+    char* iter = cmd;
+    while (*iter != '\0' || *iter != ' ')
+        iter++;
+    *iter++ = 0;
+    std::string parse = cmd;
+    cmd = iter;
+    return parse;
 }
 
 void insertionPath(Database* db, std::string command) {
@@ -63,11 +84,10 @@ void insertionPath(Database* db, std::string command) {
                 input = "";
                 std::cout << "Insert the ammount of books. \n> ";
                 std::cin >> input;
-                int n = atoi(input.c_str());
-                book->setAvailable(n);
+                book->setAvailable(atoi(input.c_str()));
 
                 Book res = db->insertOrUpdate(*book);
-                std::cout << "-----> Book inserted\n" << res.to_string() << std::endl;
+                std::cout << "-----> Book inserted\n" << res.toString() << std::endl;
                 return;
             }
             case 1: {
@@ -91,34 +111,54 @@ void insertionPath(Database* db, std::string command) {
                 member->setActive(true);
 
                 Member res = db->insertOrUpdate(*member);
-                std::cout << "-----> Member inserted\n" << res.to_string() << std::endl;
+                std::cout << "-----> Member inserted\n" << res.toString() << std::endl;
             }
             case 2: {
                 Transaction* transaction = new Transaction();
                 std::string input = "";
-                std::cout << "Insert a name.\n> ";
+                std::cout << "Insert a Book ID.\n> ";
                 std::cin >> input;
-                member->setName(input != "" ? input : NULL);
+                transaction->setBookId(atoi(input.c_str()) != -1 ? atoi(input.c_str()) : NULL);
                 input = "";
-                std::cout << "Insert an address for the member. \n> ";
+                std::cout << "Insert a Member ID.\n> ";
                 std::cin >> input;
-                member->setAddress(input != "" ? input : NULL);
+                transaction->setMemberId(atoi(input.c_str()) != -1 ? atoi(input.c_str()) : NULL);
                 input = "";
-                std::cout << "Insert an email for the member. \n> ";
+                std::cout << "Insert a transaction date.\n> ";
                 std::cin >> input;
-                member->setEmail(input != "" ? input : NULL);
+                transaction->setTransactionDate(input != "" ? input : NULL);
                 input = "";
-                std::cout << "Insert a phone for the member. \n> ";
+                std::cout << "Insert a due date.\n> ";
                 std::cin >> input;
-                member->setPhone(input != "" ? input : NULL);
-                member->setActive(true);
+                transaction->setDueDate(input != "" ? input : NULL);
+                input = "";
+                std::cout << "Insert a returning date.\n> ";
+                std::cin >> input;
+                transaction->setReturningDate(input != "" ? input : NULL);
+                input = "";
+                transaction->setIsReturned(false);
 
-                Member res = db->insertOrUpdate(*member);
-                std::cout << "-----> Member inserted\n" << res.to_string() << std::endl;
+                Transaction res = db->insertOrUpdate(*transaction);
+                std::cout << "-----> Member inserted\n" << res.toString() << std::endl;
+            }
+            case 3: {
+                Sanction* sanction = new Sanction();
+                std::string input = "";
+                std::cout << "Insert a Member ID.\n> ";
+                std::cin >> input;
+                sanction->setMemberId(atoi(input.c_str()) != -1 ? atoi(input.c_str()) : NULL);
+                input = "";
+                std::cout << "Insert an end of sanction date.\n> ";
+                std::cin >> input;
+                sanction->setEndOfSanction(input != "" ? input : NULL);
+                input = "";
+                sanction->setIsActive(false);
+
+                Sanction res = db->insertOrUpdate(*sanction);
+                std::cout << "-----> Member inserted\n" << res.toString() << std::endl;
             }
         }
     } catch (...) {
         std::cout << "Flag is not valid. If you need help, type -h.";
     }
-
 }

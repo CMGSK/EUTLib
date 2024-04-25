@@ -1,12 +1,13 @@
 #ifndef TRANSACTION_H
 #define TRANSACTION_H
 
+#include "LibraryRepository.h"
 #include <string>
+#include <sstream>
 
-class Transaction {
+class Transaction : public LibraryRepository {
 private: 
 
-    int id_;
     int bookId_;
     int memberId_;
     std::string transactionDate_;
@@ -18,15 +19,14 @@ public:
 
     Transaction();
     Transaction(int bookId, int memberId, std::string transactionDate, std::string dueDate, std::string returningDate):
-    id_(-1), bookId_(bookId), memberId_(memberId), transactionDate_(transactionDate), dueDate_(dueDate), returningDate_(returningDate), isReturned_(false)
+    LibraryRepository(), bookId_(bookId), memberId_(memberId), transactionDate_(transactionDate), dueDate_(dueDate), returningDate_(returningDate), isReturned_(false)
     {};
     Transaction(int id, int bookId, int memberId):
-    id_(id), bookId_(bookId), memberId_(memberId)
+    LibraryRepository(id), bookId_(bookId), memberId_(memberId)
     {};
     
 
     void markAsReturned() {isReturned_ = true;};
-    int getId() const {return id_;};
     int getBookId() const {return bookId_;};
     int getMemberId() const {return memberId_;};
     std::string getTransactionDate() const {return transactionDate_;};
@@ -34,15 +34,24 @@ public:
     std::string getReturningDate() const {return returningDate_;};
     int getIsReturned() const {return isReturned_;};
 
-    void setId(int n);
     void setBookId(int n);
     void setMemberId(int n);
     void setTransactionDate(std::string s);
     void setDueDate(std::string s);
     void setReturningDate(std::string s);
     void setIsReturned(bool b);
-    
 
+    std::string toString() override {
+       std::ostringstream os;
+       os << "Member id: " << this->getId() << '\n'
+       << " Relation Member-Book -> " << bookId_ << " - " << memberId_ << '\n'
+       << " --------------------" << '\n'
+       << '\t' << "Transaction date: " << transactionDate_ << '\n'
+       << '\t' << "Due date: " << dueDate_ << '\n'
+       << '\t' << "Returning date: " << returningDate_ << '\n'
+       << '\t' << "Has been returned: " << isReturned_ << std::endl;
+       return os.str();
+    };
 };
 
 #endif

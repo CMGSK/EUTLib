@@ -2,11 +2,12 @@
 #define MEMBER_H
 
 #include <string>
+#include <sstream>
+#include "LibraryRepository.h"
 
-class Member {
+class Member : public LibraryRepository {
 private: 
 
-    int id_;
     std::string name_;
     std::string address_;
     std::string email_;
@@ -18,26 +19,37 @@ public:
 
     Member();
     Member(std::string name, std::string address, std::string email, std::string phone):
-    id_(-1), name_(name), address_(address), email_(email), phone_(phone)
+    LibraryRepository(), name_(name), address_(address), email_(email), phone_(phone)
     {};
     Member(int id, std::string name):
-    id_(id), name_(name) 
+    LibraryRepository(id), name_(name) 
     {};
 
-    void setId(int n);
-    void setName(std::string s);
-    void setAddress(std::string s);
-    void setEmail(std::string s);
-    void setPhone(std::string s);
-    void setRestriction(std::string s);
+    void setName(std::string s) {name_ = s;};
+    void setAddress(std::string s) {address_ = s;};
+    void setEmail(std::string s) {email_ = s;};
+    void setPhone(std::string s) {phone_ =s;};
+    void setRestriction(std::string s) {restrictedUntil_ = s;};
     void setActive(bool b) {active_ = b;};
-    int getId() const {return id_;};
     std::string getName() const {return name_;};
     std::string getAddress() const {return address_;};
     std::string getEmail() const {return email_;};
     std::string getPhone () const {return phone_;};
     std::string getRestrictedUntil() const {return restrictedUntil_;};
     bool getActive() const {return active_;};
+
+    std::string toString() override {
+       std::ostringstream os;
+       os << "Member id: " << this->getId() << '\n'
+       << "--------" << '\n'
+       << '\t' << "Name: " << name_ << '\n'
+       << '\t' << "Address: " << address_ << '\n'
+       << '\t' << "Email: " << email_ << '\n'
+       << '\t' << "Phone: " << phone_ << '\n'
+       << '\t' << "Current restriction: " << restrictedUntil_ << '\n'
+       << '\t' << "Active user: " << active_ << std::endl;
+       return os.str();
+    };
 
 };
 

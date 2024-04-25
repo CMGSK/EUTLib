@@ -1,8 +1,10 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
+#include <memory>
 #include <string>
-#include <list>
+#include <vector>
+#include "LibraryRepository.h"
 #include "Member.h"
 #include "Sanction.h"
 #include "Transaction.h"
@@ -24,7 +26,7 @@ public:
     
     void printHelp();
 
-    void query(std::list<void*> &target, std::string from, std::string filter, std::string value, bool partialMatch, bool isTotal);
+    void query(std::vector<std::shared_ptr<LibraryRepository>> &target, std::string from, std::string filter, std::string value, bool partialMatch, bool isTotal);
 
     Book insertOrUpdate(const Book &book);
     Transaction insertOrUpdate(const Transaction &transaction);
