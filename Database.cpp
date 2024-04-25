@@ -114,11 +114,11 @@ bool Database::deleteSingle(std::string table, int id){
     } else return true;
 }
 
-bool Database::deleteBulk(std::string table, int id[], int arrSize){
+bool Database::deleteBulk(std::string table, std::vector<int> id){
     std::ostringstream os;
     os << "DELETE FROM " << table << " WHERE id IN ( ";
-    for (int i=0; i<arrSize; i++){
-        os << id[i] << (i == arrSize-1 ? ")" : ",");
+    for (int i=0; i<id.size(); i++){
+        os << id[i] << (i == id.size()-1 ? ")" : ",");
     }
 
     if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){

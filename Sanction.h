@@ -26,6 +26,7 @@ public:
     void setEndOfSanction(std::string s) { endOfSanction_ = s;};
     void setIsActive(bool b) {isActive_ = b;};
     void markAsFinished(){isActive_ = false;};
+
     int getMemberId() const {return memberId_;};
     std::string getEndOfSanction()  const {return endOfSanction_;};
     bool getIsActive() const {return isActive_;};

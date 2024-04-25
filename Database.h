@@ -34,7 +34,7 @@ public:
     Sanction insertOrUpdate(const Sanction &sanction);
 
     bool deleteSingle(std::string table, int id);
-    bool deleteBulk(std::string table, int id[], int arrSize);
+    bool deleteBulk(std::string table, std::vector<int> id);
 
 };
 
