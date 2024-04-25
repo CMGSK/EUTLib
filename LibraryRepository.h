@@ -18,7 +18,7 @@ public:
     int getId() const {return id_;};
     void setId(int id){id_ = id;};
 
-    virtual std::string toString();
+    virtual std::string toString(){ return nullptr; };
 
 };
 
@@ -31,7 +31,7 @@ private:
 
 public:
 
-    Sanction();
+    Sanction() {}
     Sanction(int memberId, std::string endOfSanction):
     LibraryRepository(), memberId_(memberId), endOfSanction_(endOfSanction), isActive_(true)
     {};
@@ -71,7 +71,7 @@ private:
 
 public:
 
-    Member();
+    Member() {}
     Member(std::string name, std::string address, std::string email, std::string phone):
     LibraryRepository(), name_(name), address_(address), email_(email), phone_(phone)
     {};
@@ -119,7 +119,7 @@ private:
 
 public:
 
-    Book();
+    Book() {}
     Book(std::string title, std::string ISBN, int available):
     LibraryRepository(), title_(title), author_("null"), genre_("null"), ISBN_(ISBN), year_(0), available_(available)
     {};
@@ -170,7 +170,7 @@ private:
 
 public:
 
-    Transaction();
+    Transaction() {}
     Transaction(int bookId, int memberId, std::string transactionDate, std::string dueDate, std::string returningDate):
     LibraryRepository(), bookId_(bookId), memberId_(memberId), transactionDate_(transactionDate), dueDate_(dueDate), returningDate_(returningDate), isReturned_(false)
     {};
@@ -187,12 +187,12 @@ public:
     std::string getReturningDate() const {return returningDate_;};
     int getIsReturned() const {return isReturned_;};
 
-    void setBookId(int n);
-    void setMemberId(int n);
-    void setTransactionDate(std::string s);
-    void setDueDate(std::string s);
-    void setReturningDate(std::string s);
-    void setIsReturned(bool b);
+    void setBookId(int n) { bookId_ = n; };
+    void setMemberId(int n) { memberId_ = n; };
+    void setTransactionDate(std::string s) { transactionDate_ = s; };
+    void setDueDate(std::string s) { dueDate_ = s; };
+    void setReturningDate(std::string s) { returningDate_ = s; };
+    void setIsReturned(bool b) { isReturned_ = b; };
 
     std::string toString() override {
        std::ostringstream os;
