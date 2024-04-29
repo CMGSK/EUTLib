@@ -1,4 +1,3 @@
-#include <cmath>
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -150,7 +149,7 @@ bool Database::deleteBulk(std::string table, std::vector<int> id){
 }
 
 //Selects
-void Database::query(std::string from, std::string filter, std::string value, bool partialMatch, bool isTotal){
+void Database::query(std::vector<std::shared_ptr<LibraryRepository>> &target, std::string from, std::string filter, std::string value, bool partialMatch, bool isTotal){
     std::ostringstream os;
     os << "SELECT * FROM " << from;
     if (!isTotal) os << " WHERE " << filter << (partialMatch ? " LIKE '%" : "='") << value << (partialMatch ? "%'" : "'");

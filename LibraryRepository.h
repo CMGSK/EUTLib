@@ -1,7 +1,6 @@
 #ifndef LIBRARYREPOSITORY_H
 #define LIBRARYREPOSITORY_H
 
-#include "Database.h"
 #include <memory>
 #include <string>
 #include <sstream>
@@ -23,170 +22,169 @@ public:
 
 };
 
-class Sanction : public LibraryRepository {
-private: 
+// class Sanction : public LibraryRepository {
+// private: 
 
-    int memberId_;
-    std::string endOfSanction_;
-    bool isActive_;
+//     int memberId_;
+//     std::string endOfSanction_;
+//     bool isActive_;
 
-public:
+// public:
 
-    Sanction() {};
-    Sanction(std::string endOfSanction, bool active, int memberId, int id);
-    Sanction(int memberId, std::string endOfSanction):
-    LibraryRepository(), memberId_(memberId), endOfSanction_(endOfSanction), isActive_(true)
-    {};
-    Sanction(int id, int memberId, std::string endOfSanction):
-    LibraryRepository(id), memberId_(memberId), endOfSanction_(endOfSanction), isActive_(true)
-    {};
+//     Sanction() {};
+//     Sanction(std::string endOfSanction, bool active, int memberId, int id);
+//     Sanction(int memberId, std::string endOfSanction):
+//     LibraryRepository(), memberId_(memberId), endOfSanction_(endOfSanction), isActive_(true)
+//     {};
+//     Sanction(int id, int memberId, std::string endOfSanction):
+//     LibraryRepository(id), memberId_(memberId), endOfSanction_(endOfSanction), isActive_(true)
+//     {};
 
-    void setMemberId(int n) {memberId_ = n;};
-    void setEndOfSanction(std::string s) { endOfSanction_ = s;};
-    void setIsActive(bool b) {isActive_ = b;};
-    void markAsFinished(){isActive_ = false;};
+//     void setMemberId(int n) {memberId_ = n;};
+//     void setEndOfSanction(std::string s) { endOfSanction_ = s;};
+//     void setIsActive(bool b) {isActive_ = b;};
+//     void markAsFinished(){isActive_ = false;};
 
-    int getMemberId() const {return memberId_;};
-    std::string getEndOfSanction()  const {return endOfSanction_;};
-    bool getIsActive() const {return isActive_;};
+//     int getMemberId() const {return memberId_;};
+//     std::string getEndOfSanction()  const {return endOfSanction_;};
+//     bool getIsActive() const {return isActive_;};
 
-    std::string toString() override;
+//     std::string toString() override;
 
-    std::string getUpdateQry() const;
+//     std::string getUpdateQry() const;
 
-    std::string getInsertQry() const;
-};
+//     std::string getInsertQry() const;
+// };
 
-class Member : public LibraryRepository {
-private: 
+// class Member : public LibraryRepository {
+// private: 
 
-    std::string name_;
-    std::string address_;
-    std::string email_;
-    std::string phone_;
-    std::string restrictedUntil_;
-    bool active_;
+//     std::string name_;
+//     std::string address_;
+//     std::string email_;
+//     std::string phone_;
+//     std::string restrictedUntil_;
+//     bool active_;
 
-public:
+// public:
 
-    Member() {};
-    Member(std::string name, std::string address, std::string email, std::string phone, std::string restrictedUntil, bool isActive, int id);
-    Member(std::string name, std::string address, std::string email, std::string phone):
-    LibraryRepository(), name_(name), address_(address), email_(email), phone_(phone)
-    {};
-    Member(int id, std::string name):
-    LibraryRepository(id), name_(name) 
-    {};
+//     Member() {};
+//     Member(std::string name, std::string address, std::string email, std::string phone, std::string restrictedUntil, bool isActive, int id);
+//     Member(std::string name, std::string address, std::string email, std::string phone):
+//     LibraryRepository(), name_(name), address_(address), email_(email), phone_(phone)
+//     {};
+//     Member(int id, std::string name):
+//     LibraryRepository(id), name_(name) 
+//     {};
 
-    void setName(std::string s) {name_ = s;};
-    void setAddress(std::string s) {address_ = s;};
-    void setEmail(std::string s) {email_ = s;};
-    void setPhone(std::string s) {phone_ =s;};
-    void setRestriction(std::string s) {restrictedUntil_ = s;};
-    void setActive(bool b) {active_ = b;};
-    std::string getName() const {return name_;};
-    std::string getAddress() const {return address_;};
-    std::string getEmail() const {return email_;};
-    std::string getPhone () const {return phone_;};
-    std::string getRestrictedUntil() const {return restrictedUntil_;};
-    bool getActive() const {return active_;};
+//     void setName(std::string s) {name_ = s;};
+//     void setAddress(std::string s) {address_ = s;};
+//     void setEmail(std::string s) {email_ = s;};
+//     void setPhone(std::string s) {phone_ =s;};
+//     void setRestriction(std::string s) {restrictedUntil_ = s;};
+//     void setActive(bool b) {active_ = b;};
+//     std::string getName() const {return name_;};
+//     std::string getAddress() const {return address_;};
+//     std::string getEmail() const {return email_;};
+//     std::string getPhone () const {return phone_;};
+//     std::string getRestrictedUntil() const {return restrictedUntil_;};
+//     bool getActive() const {return active_;};
 
-    std::string toString() override;
+//     std::string toString() override;
        
 
-    std::string getUpdateQry() const;
+//     std::string getUpdateQry() const;
 
-    std::string getInsertQry() const;
+//     std::string getInsertQry() const;
 
 
-};
+// };
 
-class Book : public LibraryRepository{
-private: 
+// class Book : public LibraryRepository{
+// private: 
 
-    std::string title_;
-    std::string author_;
-    std::string genre_;
-    std::string ISBN_;
-    int year_;
-    int available_;
+//     std::string title_;
+//     std::string author_;
+//     std::string genre_;
+//     std::string ISBN_;
+//     int year_;
+//     int available_;
 
-public:
+// public:
 
-    Book() {}
-    Book(std::string title, std::string author, std::string genre, std::string ISBN, int year, int available);
-    Book(std::string title, std::string ISBN, int available):
-    LibraryRepository(), title_(title), author_("null"), genre_("null"), ISBN_(ISBN), year_(0), available_(available)
-    {};
-    Book(int id, std::string title, std::string ISBN):
-    LibraryRepository(id), title_(title), ISBN_(ISBN) 
-    {};
+//     Book() {}
+//     Book(std::string title, std::string author, std::string genre, std::string ISBN, int year, int available);
+//     Book(std::string title, std::string ISBN, int available):
+//     LibraryRepository(), title_(title), author_("null"), genre_("null"), ISBN_(ISBN), year_(0), available_(available)
+//     {};
+//     Book(int id, std::string title, std::string ISBN):
+//     LibraryRepository(id), title_(title), ISBN_(ISBN) 
+//     {};
 
-    void setTitle(std::string s) {title_ = s;};
-    void setAuthor(std::string s) {author_ = s;};
-    void setGenre(std::string s) {genre_ = s;};
-    void setISBN(std::string s) {ISBN_ = s;};
-    void setYear(int n) {year_ = n;};
-    void setAvailable(int n) {available_ = n;};
-    void dropAvailable() {available_--;};
-    void addAvailable() {available_++;};
+//     void setTitle(std::string s) {title_ = s;};
+//     void setAuthor(std::string s) {author_ = s;};
+//     void setGenre(std::string s) {genre_ = s;};
+//     void setISBN(std::string s) {ISBN_ = s;};
+//     void setYear(int n) {year_ = n;};
+//     void setAvailable(int n) {available_ = n;};
+//     void dropAvailable() {available_--;};
+//     void addAvailable() {available_++;};
 
-    std::string getTitle() const {return title_;};
-    std::string getAuthor() const {return author_;};
-    std::string getGenre() const {return genre_;};
-    std::string getISBN() const {return ISBN_;};
-    int getYear() const {return year_;};
-    int getAvailable() const {return available_;};
+//     std::string getTitle() const {return title_;};
+//     std::string getAuthor() const {return author_;};
+//     std::string getGenre() const {return genre_;};
+//     std::string getISBN() const {return ISBN_;};
+//     int getYear() const {return year_;};
+//     int getAvailable() const {return available_;};
 
-    std::string toString() override;
-    std::string getUpdateQry() const;
-    std::string getInsertQry() const;
-    static void execSelect(Database* db, bool isTotal);
+//     std::string toString() override;
+//     std::string getUpdateQry() const;
+//     std::string getInsertQry() const;
 
-};
+// };
 
-class Transaction : public LibraryRepository {
-private: 
+// class Transaction : public LibraryRepository {
+// private: 
 
-    int bookId_;
-    int memberId_;
-    std::string transactionDate_;
-    std::string dueDate_;
-    std::string returningDate_;
-    bool isReturned_;
+//     int bookId_;
+//     int memberId_;
+//     std::string transactionDate_;
+//     std::string dueDate_;
+//     std::string returningDate_;
+//     bool isReturned_;
 
-public:
+// public:
 
-    Transaction() {};
-    Transaction(std::string transactionDate, std::string dueDate, std::string returningDate, bool isReturned, int bookId, int memberId, int id);
-    Transaction(int bookId, int memberId, std::string transactionDate, std::string dueDate, std::string returningDate):
-    LibraryRepository(), bookId_(bookId), memberId_(memberId), transactionDate_(transactionDate), dueDate_(dueDate), returningDate_(returningDate), isReturned_(false)
-    {};
-    Transaction(int id, int bookId, int memberId):
-    LibraryRepository(id), bookId_(bookId), memberId_(memberId)
-    {};
+//     Transaction() {};
+//     Transaction(std::string transactionDate, std::string dueDate, std::string returningDate, bool isReturned, int bookId, int memberId, int id);
+//     Transaction(int bookId, int memberId, std::string transactionDate, std::string dueDate, std::string returningDate):
+//     LibraryRepository(), bookId_(bookId), memberId_(memberId), transactionDate_(transactionDate), dueDate_(dueDate), returningDate_(returningDate), isReturned_(false)
+//     {};
+//     Transaction(int id, int bookId, int memberId):
+//     LibraryRepository(id), bookId_(bookId), memberId_(memberId)
+//     {};
     
 
-    void markAsReturned() {isReturned_ = true;};
-    int getBookId() const {return bookId_;};
-    int getMemberId() const {return memberId_;};
-    std::string getTransactionDate() const {return transactionDate_;};
-    std::string getDueDate () const {return dueDate_;};
-    std::string getReturningDate() const {return returningDate_;};
-    int getIsReturned() const {return isReturned_;};
+//     void markAsReturned() {isReturned_ = true;};
+//     int getBookId() const {return bookId_;};
+//     int getMemberId() const {return memberId_;};
+//     std::string getTransactionDate() const {return transactionDate_;};
+//     std::string getDueDate () const {return dueDate_;};
+//     std::string getReturningDate() const {return returningDate_;};
+//     int getIsReturned() const {return isReturned_;};
 
-    void setBookId(int n) { bookId_ = n; };
-    void setMemberId(int n) { memberId_ = n; };
-    void setTransactionDate(std::string s) { transactionDate_ = s; };
-    void setDueDate(std::string s) { dueDate_ = s; };
-    void setReturningDate(std::string s) { returningDate_ = s; };
-    void setIsReturned(bool b) { isReturned_ = b; };
+//     void setBookId(int n) { bookId_ = n; };
+//     void setMemberId(int n) { memberId_ = n; };
+//     void setTransactionDate(std::string s) { transactionDate_ = s; };
+//     void setDueDate(std::string s) { dueDate_ = s; };
+//     void setReturningDate(std::string s) { returningDate_ = s; };
+//     void setIsReturned(bool b) { isReturned_ = b; };
 
-    std::string toString() override;
+//     std::string toString() override;
 
-    std::string getUpdateQry() const;
+//     std::string getUpdateQry() const;
 
-    std::string getInsertQry() const;
-};
+//     std::string getInsertQry() const;
+// };
 
 #endif
