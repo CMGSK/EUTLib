@@ -1,9 +1,11 @@
 #include "Database.h"
 #include "Commands.h"
 #include "LibraryRepository.h"
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <iterator>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -66,126 +68,32 @@ std::string parseCommand(char* &cmd){
 }
 
 void selectionPath(Database* db, std::string command, bool isTotal){
-    try{
-        switch (flag_case.at(command)) {
-            case 1: {
-                if(isTotal){
-                    std::vector<std::shared_ptr<LibraryRepository>> r;
-                    db->query(r, "members", "", "", false, true);
-                    if (r.empty()) std::cout << "No results." << std::endl;
-                    for(auto item : r)
-                        std::static_pointer_cast<Member>(item)->toString();
-                } 
-                else {
-                    std::vector<std::shared_ptr<LibraryRepository>> r;
-                    std::string filter;
-                    std::string value;
-                    char partialMatch;
+    std::vector<std::shared_ptr<LibraryRepository>> r;
+    std::string filter;
+    std::string value;
+    char partialMatch;
 
-                    std::cout << "Type the the attribute you will look for:\n>";
-                    db->printAttr("members");
-                    std::getline(std::cin, filter);
-                    std::cout << "Type the the value you want to check\n>";
-                    std::getline(std::cin, value);
-                    std::cout << "Do you want to include partial matches? (Y/N): ";
-                    std::cin >> partialMatch;
+    std::string attribute = std::find_if(std::begin(from_case),
+            std::end(from_case),
+            [&command](auto e){
+            return e.second == flag_case.at(command);
+            })->first;
+    if(isTotal){
+        db->query(r, attribute, "", "", false, true);
+        if (r.empty()) std::cout << "No results." << std::endl;
+    } 
+    else {
+        std::cout << "Type the the attribute you will look for:\n>";
+        db->printAttr(attribute);
+        std::getline(std::cin, filter);
+        std::cout << "Type the the value you want to check\n>";
+        std::getline(std::cin, value);
+        std::cout << "Do you want to include partial matches? (Y/N): ";
+        std::cin >> partialMatch;
 
-                    db->query(r, "members", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
-                    if (r.empty()) std::cout << "No results." << std::endl;
-
-                    // for(auto item : r)
-                    //     std::static_pointer_cast<Member>(item)->toString();
-                }
-                break;
-            }
-            case 2: {
-                if(isTotal){
-                    std::vector<std::shared_ptr<LibraryRepository>> r;
-                    db->query(r, "members", "", "", false, true);
-                    if (r.empty()) std::cout << "No results." << std::endl;
-                    for(auto item : r)
-                        std::static_pointer_cast<Member>(item)->toString();
-                } 
-                else {
-                    std::vector<std::shared_ptr<LibraryRepository>> r;
-                    std::string filter;
-                    std::string value;
-                    char partialMatch;
-
-                    std::cout << "Type the the attribute you will look for:\n>";
-                    db->printAttr("members");
-                    std::getline(std::cin, filter);
-                    std::cout << "Type the the value you want to check\n>";
-                    std::getline(std::cin, value);
-                    std::cout << "Do you want to include partial matches? (Y/N): ";
-                    std::cin >> partialMatch;
-
-                    db->query(r, "members", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
-                    if (r.empty()) std::cout << "No results." << std::endl;
-
-                    // for(auto item : r)
-                    //     std::static_pointer_cast<Member>(item)->toString();
-                }
-            }
-            case 3: {
-                if(isTotal){
-                    std::vector<std::shared_ptr<LibraryRepository>> r;
-                    db->query(r, "transactions", "", "", false, true);
-                    if (r.empty()) std::cout << "No results." << std::endl;
-                    for(auto item : r)
-                        std::static_pointer_cast<Transaction>(item)->toString();
-                } 
-                else {
-                    std::vector<std::shared_ptr<LibraryRepository>> r;
-                    std::string filter;
-                    std::string value;
-                    char partialMatch;
-
-                    std::cout << "Type the the attribute you will look for:\n>";
-                    db->printAttr("transactions");
-                    std::getline(std::cin, filter);
-                    std::cout << "Type the the value you want to check\n>";
-                    std::getline(std::cin, value);
-                    std::cout << "Do you want to include partial matches? (Y/N): ";
-                    std::cin >> partialMatch;
-
-                    db->query(r, "transactions", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
-                    if (r.empty()) std::cout << "No results." << std::endl;
-
-                    for(auto item : r)
-                        std::static_pointer_cast<Transaction>(item)->toString();
-                }
-            }
-            case 4: {
-                if(isTotal){
-                    std::vector<std::shared_ptr<LibraryRepository>> r;
-                    db->query(r, "sanctions", "", "", false, true);
-                    if (r.empty()) std::cout << "No results." << std::endl;
-                    for(auto item : r)
-                        std::static_pointer_cast<Sanction>(item)->toString();
-                } 
-                else {
-                    std::vector<std::shared_ptr<LibraryRepository>> r;
-                    std::string filter;
-                    std::string value;
-                    char partialMatch;
-
-                    std::cout << "Type the the attribute you will look for:\n>";
-                    db->printAttr("sacntions");
-                    std::getline(std::cin, filter);
-                    std::cout << "Type the the value you want to check\n>";
-                    std::getline(std::cin, value);
-                    std::cout << "Do you want to include partial matches? (Y/N): ";
-                    std::cin >> partialMatch;
-
-                    db->query(r, "sanctions", filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
-
-                    for(auto item : r)
-                        std::static_pointer_cast<Sanction>(item)->toString();
-                }
-            }
-        }
-    } catch (...) { std::cout << "Flag is not valid. If you need help, type -h."; }
+        db->query(r, attribute, filter, value, partialMatch == 'Y' || partialMatch == 'y', false);
+        if (r.empty()) std::cout << "No results." << std::endl;
+    }
 }
 
 void deletionPath(Database* db, std::string command){
@@ -230,78 +138,25 @@ void insertionPath(Database* db, std::string command) {
     try{
         switch (flag_case.at(command)) {
             case 1: {
-                Book* book = new Book();
-
+                Book* book = new Book(false);
                 db->insertOrUpdate(*book);
                 std::cout << "-------------\nBook inserted successfully.\n-------------\n\n" << std::endl;
                 return;
             }
             case 2: {
                 Member* member = new Member();
-                std::string input = "";
-                std::cout << "Insert a name.\n> ";
-                std::getline(std::cin, input);
-                member->setName(input != "" ? input : "null");
-                input = "";
-                std::cout << "Insert an address for the member. \n> ";
-                std::getline(std::cin, input);
-                member->setAddress(input != "" ? input : "null");
-                input = "";
-                std::cout << "Insert an email for the member. \n> ";
-                std::getline(std::cin, input);
-                member->setEmail(input != "" ? input : "null");
-                input = "";
-                std::cout << "Insert a phone for the member. \n> ";
-                std::getline(std::cin, input);
-                member->setPhone(input != "" ? input : "null");
-                member->setActive(true);
-
                 Member res = db->insertOrUpdate(*member);
-                std::cout << "-----> Member inserted\n\n" << res.toString() << std::endl;
+                std::cout << "-------------\nMember inserted successfully.\n-------------\n\n" << std::endl;
             }
             case 3: {
                 Transaction* transaction = new Transaction();
-                std::string input = "";
-                std::cout << "Insert a Book ID.\n> ";
-                std::getline(std::cin, input);
-                transaction->setBookId(atoi(input.c_str()) != -1 ? atoi(input.c_str()) : -1);
-                input = "";
-                std::cout << "Insert a Member ID.\n> ";
-                std::getline(std::cin, input);
-                transaction->setMemberId(atoi(input.c_str()) != -1 ? atoi(input.c_str()) : -1);
-                input = "";
-                std::cout << "Insert a transaction date.\n> ";
-                std::getline(std::cin, input);
-                transaction->setTransactionDate(input != "" ? input : "null");
-                input = "";
-                std::cout << "Insert a due date.\n> ";
-                std::getline(std::cin, input);
-                transaction->setDueDate(input != "" ? input : "null");
-                input = "";
-                std::cout << "Insert a returning date.\n> ";
-                std::getline(std::cin, input);
-                transaction->setReturningDate(input != "" ? input : "null");
-                input = "";
-                transaction->setIsReturned(false);
-
                 Transaction res = db->insertOrUpdate(*transaction);
-                std::cout << "-----> Transaction inserted.\n\n" << res.toString() << std::endl;
+                std::cout << "-------------\nTransaction inserted successfully.\n-------------\n\n" << std::endl;
             }
             case 4: {
                 Sanction* sanction = new Sanction();
-                std::string input = "";
-                std::cout << "Insert a Member ID.\n> ";
-                std::getline(std::cin, input);
-                sanction->setMemberId(atoi(input.c_str()) != -1 ? atoi(input.c_str()) : -1);
-                input = "";
-                std::cout << "Insert an end of sanction date.\n> ";
-                std::getline(std::cin, input);
-                sanction->setEndOfSanction(input != "" ? input : "null");
-                input = "";
-                sanction->setIsActive(false);
-
                 Sanction res = db->insertOrUpdate(*sanction);
-                std::cout << "-----> Sanction inserted\n\n" << res.toString() << std::endl;
+                std::cout << "-------------\nSanction inserted successfully.\n-------------\n\n" << std::endl;
             }
         }
     } catch (...) { std::cout << "Flag is not valid. If you need help, type -h."; }
@@ -311,110 +166,25 @@ void updatePath(Database* db, std::string command) {
     try{
         switch (flag_case.at(command)) {
             case 1: {
-                Book* book = new Book();
-                std::string input = "";
-                std::cout << "Insert the ID.\n> ";
-                std::getline(std::cin, input);
-                book->setId(atoi(input.c_str()));
-                input = "";
-                std::cout << "Insert a title for the book.\n> ";
-                std::getline(std::cin, input);
-                book->setTitle(input != "" ? input : "null");
-                input = "";
-                std::cout << "Insert an author for the book. (Optional)\n> ";
-                std::getline(std::cin, input);
-                book->setAuthor(input);
-                input = "";
-                std::cout << "Insert an ISBN for the book. \n> ";
-                std::getline(std::cin, input);
-                book->setISBN(input != "" ? input : "null");
-                input = "";
-                std::cout << "Insert the ammount of books. \n> ";
-                std::getline(std::cin, input);
-                book->setAvailable(atoi(input.c_str()));
-
+                Book* book = new Book(true);
                 Book res = db->insertOrUpdate(*book);
-                std::cout << "-----> Book inserted\n" << res.toString() << std::endl;
+                std::cout << "-------------\nBook updated successfully.\n-------------\n\n" << std::endl;
                 return;
             }
             case 2: {
-                Member* member = new Member();
-                std::string input = "";
-                std::cout << "Insert the ID.\n> ";
-                std::getline(std::cin, input);
-                member->setId(atoi(input.c_str()));
-                input = "";
-                std::cout << "Insert a name.\n> ";
-                std::getline(std::cin, input);
-                member->setName(input != "" ? input : "null");
-                input = "";
-                std::cout << "Insert an address for the member. \n> ";
-                std::getline(std::cin, input);
-                member->setAddress(input != "" ? input : "null");
-                input = "";
-                std::cout << "Insert an email for the member. \n> ";
-                std::getline(std::cin, input);
-                member->setEmail(input != "" ? input : "null");
-                input = "";
-                std::cout << "Insert a phone for the member. \n> ";
-                std::getline(std::cin, input);
-                member->setPhone(input != "" ? input : "null");
-                member->setActive(true);
-
+                Member* member = new Member(true);
                 Member res = db->insertOrUpdate(*member);
-                std::cout << "-----> Member inserted\n" << res.toString() << std::endl;
+                std::cout << "-------------\nMember updated successfully.\n-------------\n\n" << std::endl;
             }
             case 3: {
-                Transaction* transaction = new Transaction();
-                std::string input = "";
-                std::cout << "Insert the ID.\n> ";
-                std::getline(std::cin, input);
-                transaction->setId(atoi(input.c_str()));
-                input = "";
-                std::cout << "Insert a Book ID.\n> ";
-                std::getline(std::cin, input);
-                transaction->setBookId(atoi(input.c_str()) != -1 ? atoi(input.c_str()) : -1);
-                input = "";
-                std::cout << "Insert a Member ID.\n> ";
-                std::getline(std::cin, input);
-                transaction->setMemberId(atoi(input.c_str()) != -1 ? atoi(input.c_str()) : -1);
-                input = "";
-                std::cout << "Insert a transaction date.\n> ";
-                std::getline(std::cin, input);
-                transaction->setTransactionDate(input != "" ? input : "null");
-                input = "";
-                std::cout << "Insert a due date.\n> ";
-                std::getline(std::cin, input);
-                transaction->setDueDate(input != "" ? input : "null");
-                input = "";
-                std::cout << "Insert a returning date.\n> ";
-                std::getline(std::cin, input);
-                transaction->setReturningDate(input != "" ? input : "null");
-                input = "";
-                transaction->setIsReturned(false);
-
+                Transaction* transaction = new Transaction(true);
                 Transaction res = db->insertOrUpdate(*transaction);
-                std::cout << "-----> Member inserted\n" << res.toString() << std::endl;
+            std::cout << "-------------\nTransaction updated successfully.\n-------------\n\n" << std::endl;
             }
             case 4: {
-                Sanction* sanction = new Sanction();
-                std::string input = "";
-                std::cout << "Insert the ID.\n> ";
-                std::getline(std::cin, input);
-                sanction->setId(atoi(input.c_str()));
-                input = "";
-                std::cout << "Insert a Member ID.\n> ";
-                std::getline(std::cin, input);
-                sanction->setMemberId(atoi(input.c_str()) != -1 ? atoi(input.c_str()) : -1);
-                input = "";
-                std::cout << "Insert an end of sanction date.\n> ";
-                std::getline(std::cin, input);
-                sanction->setEndOfSanction(input != "" ? input : "null");
-                input = "";
-                sanction->setIsActive(false);
-
+                Sanction* sanction = new Sanction(true);
                 Sanction res = db->insertOrUpdate(*sanction);
-                std::cout << "-----> Member inserted\n" << res.toString() << std::endl;
+            std::cout << "-------------\nSanction updated successfully.\n-------------\n\n" << std::endl;
             }
         }
     } catch (...) { std::cout << "Flag is not valid. If you need help, type -h."; }
