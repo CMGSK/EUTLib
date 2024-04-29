@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -6,6 +7,7 @@
 
 #include "Database.h"
 #include "Commands.h"
+#include "LibraryRepository.h"
 
 static const std::string sql = "CREATE TABLE IF NOT EXISTS Books (" \
             "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
@@ -93,6 +95,7 @@ void Database::printHelp(){
     std::cout << "\t [-t] for transactions" << std::endl;
     std::cout << "\t [-s] for sanctions" << std::endl;
     std::cout << "\t [-s] for sanctions" << std::endl;
+    std::cout << ">";
 }
 
 void Database::printAttr(std::string item){
@@ -147,12 +150,12 @@ bool Database::deleteBulk(std::string table, std::vector<int> id){
 }
 
 //Selects
-void Database::query(std::vector<std::shared_ptr<LibraryRepository>> &target, std::string from, std::string filter, std::string value, bool partialMatch, bool isTotal){
+void Database::query(std::string from, std::string filter, std::string value, bool partialMatch, bool isTotal){
     std::ostringstream os;
     os << "SELECT * FROM " << from;
     if (!isTotal) os << " WHERE " << filter << (partialMatch ? " LIKE '%" : "='") << value << (partialMatch ? "%'" : "'");
 
-    if(sqlite3_prepare_v2(cx_, sql.c_str(), -1, &ptr, NULL)){
+    if(sqlite3_prepare_v2(cx_, os.str().c_str(), -1, &ptr_, NULL)){
         std::cout << sqlite3_errmsg(cx_) << std::endl;
         return;
     }
@@ -160,53 +163,58 @@ void Database::query(std::vector<std::shared_ptr<LibraryRepository>> &target, st
     try{
         switch (from_case.at(from)) {
             case 0: {
-                while (sqlite3_step(ptr) == SQLITE_ROW){
-                    std::shared_ptr<Book> book = std::make_shared<Book>();
-                    book->setId(sqlite3_column_int(ptr, 0));
-                    book->setTitle(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 1)));
-                    book->setAuthor(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 2)));
-                    book->setGenre(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 3)));
-                    book->setYear(sqlite3_column_int(ptr, 4));
-                    book->setAvailable(sqlite3_column_int(ptr, 5));
+                while (sqlite3_step(ptr_) == SQLITE_ROW){
+                    std::shared_ptr<Book> book = std::make_shared<Book>(
+                        sqlite3_column_int(ptr_, 0),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 1)),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 2)),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 3)),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 4)),
+                        sqlite3_column_int(ptr_, 5),
+                        sqlite3_column_int(ptr_, 6)
+                    );
                     target.push_back(book);
                 }
                 return;
             }
             case 1: {
-                while (sqlite3_step(ptr) == SQLITE_ROW){
-                    std::shared_ptr<Member> member = std::make_shared<Member>();
-                    member->setId(sqlite3_column_int(ptr, 0));
-                    member->setName(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 1)));
-                    member->setAddress(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 2)));
-                    member->setEmail(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 3)));
-                    member->setPhone(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 4)));
-                    member->setRestriction(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 5)));
-                    member->setActive(sqlite3_column_int(ptr, 6));
+                while (sqlite3_step(ptr_) == SQLITE_ROW){
+                    std::shared_ptr<Member> member = std::make_shared<Member>(
+                        sqlite3_column_int(ptr_, 0),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 1)),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 2)),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 3)),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 4)),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 5)),
+                        sqlite3_column_int(ptr_, 6)
+                    );
                     target.push_back(member);
                 }
                 return;
             }
             case 2: {
-                while (sqlite3_step(ptr) == SQLITE_ROW){
-                    std::shared_ptr<Transaction> transaction = std::make_shared<Transaction>();
-                    transaction->setId(sqlite3_column_int(ptr, 0));
-                    transaction->setBookId(sqlite3_column_int(ptr, 1));
-                    transaction->setMemberId(sqlite3_column_int(ptr, 2));
-                    transaction->setTransactionDate(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 3)));
-                    transaction->setDueDate(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 4)));
-                    transaction->setReturningDate(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 5)));
-                    transaction->setIsReturned(sqlite3_column_int(ptr, 6));
+                while (sqlite3_step(ptr_) == SQLITE_ROW){
+                    std::shared_ptr<Transaction> transaction = std::make_shared<Transaction>(
+                        sqlite3_column_int(ptr_, 0),
+                        sqlite3_column_int(ptr_, 1),
+                        sqlite3_column_int(ptr_, 2),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 3)),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 4)),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 5)),
+                        sqlite3_column_int(ptr_, 6)
+                    );
                     target.push_back(transaction);
                 }
                 return;
             }
             case 3: {
-                while (sqlite3_step(ptr) == SQLITE_ROW){
-                    std::shared_ptr<Sanction> sanction = std::make_shared<Sanction>();
-                    sanction->setId(sqlite3_column_int(ptr, 0));
-                    sanction->setMemberId(sqlite3_column_int(ptr, 1));
-                    sanction->setEndOfSanction(reinterpret_cast<const char*>(sqlite3_column_text(ptr, 2)));
-                    sanction->setIsActive(sqlite3_column_int(ptr, 3));
+                while (sqlite3_step(ptr_) == SQLITE_ROW){
+                    std::shared_ptr<Sanction> sanction = std::make_shared<Sanction>(
+                        sqlite3_column_int(ptr_, 0),
+                        sqlite3_column_int(ptr_, 1),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 2)),
+                        sqlite3_column_int(ptr_, 3)
+                    );
                     target.push_back(sanction);
                 }
                 return;
@@ -224,20 +232,10 @@ Book Database::insertOrUpdate(const Book &book){
     // Update
     if (book.getId() != -1) { 
         try{
-            std::ostringstream os;
-            os << "UPDATE Books SET ";
-            if (book.getTitle() != "")
-                os << "title = '" << book.getTitle().c_str() << "',";
-            if (book.getAuthor() != "")
-                os << "author = '" << book.getAuthor().c_str() << "',";
-            if (book.getGenre() != "")
-                os << "genre = '" << book.getGenre().c_str() << "',";
-            if (book.getYear())
-                os << "year = '" << book.getYear() << "' ";
-            os << "WHERE id = " << book.getId();
-            if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
-                std::cout << os.str() << std::endl;
-                std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+            std::string qry = book.getUpdateQry();
+            if (sqlite3_exec(cx_, qry.c_str(), NULL, 0, &err_)){
+                std::cout << qry << std::endl;
+                std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << qry;
             } else {
                 int id = book.getId();
                 std::vector<std::shared_ptr<LibraryRepository>> r;
@@ -249,17 +247,10 @@ Book Database::insertOrUpdate(const Book &book){
     }
     //Insertion
     try{
-        std::ostringstream os;
-        os << "INSERT INTO Books (title, author, genre, ISBN, year, available) VALUES (" 
-        << "'" << book.getTitle().c_str() << "',"
-        << "'" << book.getAuthor().c_str() << "',"
-        << "'" << book.getGenre().c_str() << "',"
-        << "'" << book.getISBN().c_str() << "',"
-        << "'" << book.getYear() << "',"
-        << "'" << book.getAvailable() << "');";
-        if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
-            std::cout << os.str() << std::endl;
-            std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+        std::string qry = book.getInsertQry();
+        if (sqlite3_exec(cx_, qry.c_str(), NULL, 0, &err_)){
+            std::cout << qry << std::endl;
+            std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << qry;
         } else {
             int id = sqlite3_last_insert_rowid(cx_);
             std::vector<std::shared_ptr<LibraryRepository>> r;
@@ -275,22 +266,10 @@ Transaction Database::insertOrUpdate(const Transaction &transaction){
     // Update
     if (transaction.getId() != -1) {
         try{
-            std::ostringstream os;
-            os << "UPDATE Transactions SET ";
-            if (transaction.getBookId() != -1)
-                os << "book_id = '" << transaction.getBookId() << "',";
-            if (transaction.getMemberId() != -1)
-                os << "member_id = '" << transaction.getMemberId() << "',";
-            if (transaction.getTransactionDate() != "")
-                os << "transaction_date = '" << transaction.getTransactionDate().c_str() << "',";
-            if (transaction.getDueDate() != "")
-                os << "due_date = '" << transaction.getDueDate() << "', ";
-            if (transaction.getReturningDate() != "")
-                os << "returning_date = '" << transaction.getReturningDate() << "' ";
-            os << "WHERE id = " << transaction.getId();
-            if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
-                std::cout << os.str() << std::endl;
-                std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+            std::string qry = transaction.getUpdateQry();
+            if (sqlite3_exec(cx_, qry.c_str(), NULL, 0, &err_)){
+                std::cout << qry << std::endl;
+                std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << qry;
             } else {
                 int id = transaction.getId();
                 std::vector<std::shared_ptr<LibraryRepository>> r;
@@ -302,16 +281,10 @@ Transaction Database::insertOrUpdate(const Transaction &transaction){
     }
     //Insertion
     try{
-        std::ostringstream os;
-        os << "INSERT INTO Transactions (book_id, member_id, transaction_date, due_date, returning_date, is_returned) VALUES (" 
-        << "'" << transaction.getBookId() << "',"
-        << "'" << transaction.getMemberId() << "',"
-        << "'" << transaction.getTransactionDate().c_str() << "',"
-        << "'" << transaction.getDueDate().c_str() << "',"
-        << "'" << transaction.getReturningDate().c_str() << "');";
-        if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
-            std::cout << os.str() << std::endl;
-            std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+        std::string qry = transaction.getInsertQry();
+        if (sqlite3_exec(cx_, qry.c_str(), NULL, 0, &err_)){
+            std::cout << qry << std::endl;
+            std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << qry;
         } else {
             int id = sqlite3_last_insert_rowid(cx_);
             std::vector<std::shared_ptr<LibraryRepository>> r;
@@ -327,24 +300,10 @@ Member Database::insertOrUpdate(const Member &member){
     // Update
     if (member.getId() != -1) { 
         try{
-            std::ostringstream os;
-            os << "UPDATE Members SET ";
-            if (member.getName() != "")
-                os << "name = '" << member.getName() << "',";
-            if (member.getAddress() != "")
-                os << "address = '" << member.getAddress() << "',";
-            if (member.getEmail() != "")
-                os << "email = '" << member.getEmail().c_str() << "',";
-            if (member.getPhone() != "")
-                os << "phone = '" << member.getPhone() << "', ";
-            if (member.getRestrictedUntil() != "")
-                os << "restricted_until = '" << member.getPhone() << "', ";
-            if (member.getActive())
-                os << "active = " << member.getActive() << ")";
-            os << "WHERE id = " << member.getId();
-            if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
-                std::cout << os.str() << std::endl;
-                std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+            std::string qry = member.getUpdateQry();
+            if (sqlite3_exec(cx_, qry.c_str(), NULL, 0, &err_)){
+                std::cout << qry << std::endl;
+                std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << qry;
             } else {
                 int id = member.getId();
                 std::vector<std::shared_ptr<LibraryRepository>> r;
@@ -356,16 +315,10 @@ Member Database::insertOrUpdate(const Member &member){
     }
     //Insertion
     try{
-        std::ostringstream os;
-        os << "INSERT INTO Members (name, address, email, phone, active, restricted_until) VALUES (" 
-        << "'" << member.getName().c_str() << "',"
-        << "'" << member.getAddress().c_str() << "',"
-        << "'" << member.getEmail().c_str() << "',"
-        << "'" << member.getPhone().c_str() << "',"
-        << "'" << member.getRestrictedUntil().c_str() << "');";
-        if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
-            std::cout << os.str() << std::endl;
-            std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+        std::string qry = member.getInsertQry();
+        if (sqlite3_exec(cx_, qry.c_str(), NULL, 0, &err_)){
+            std::cout << qry << std::endl;
+            std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << qry;
         } else {
             int id = sqlite3_last_insert_rowid(cx_);
             std::vector<std::shared_ptr<LibraryRepository>> r;
@@ -381,14 +334,10 @@ Sanction Database::insertOrUpdate(const Sanction &sanction){
     // Update
     if (sanction.getId() != -1) { 
         try{
-            std::ostringstream os;
-            os << "UPDATE Sanctions SET ";
-            if (sanction.getIsActive())
-                os << "is_active = " << sanction.getIsActive() << ")";
-            os << "WHERE id = " << sanction.getId();
-            if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
-                std::cout << os.str() << std::endl;
-                std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+            std::string qry = sanction.getUpdateQry();
+            if (sqlite3_exec(cx_, qry.c_str(), NULL, 0, &err_)){
+                std::cout << qry << std::endl;
+                std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << qry;
             } else {
                 int id = sanction.getId();
                 std::vector<std::shared_ptr<LibraryRepository>> r;
@@ -400,14 +349,10 @@ Sanction Database::insertOrUpdate(const Sanction &sanction){
     }
     //Insertion
     try{
-        std::ostringstream os;
-        os << "INSERT INTO Sanctions (member_id, end_of_sanction, is_active) VALUES (" 
-        << "'" << sanction.getMemberId() << "',"
-        << "'" << sanction.getEndOfSanction().c_str() << "',"
-        << "'" << sanction.getIsActive() << "');";
-        if (sqlite3_exec(cx_, os.str().c_str(), NULL, 0, &err_)){
-            std::cout << os.str() << std::endl;
-            std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << os.str();
+        std::string qry = sanction.getInsertQry();
+        if (sqlite3_exec(cx_, qry.c_str(), NULL, 0, &err_)){
+            std::cout << qry << std::endl;
+            std::cout << "Error:" << sqlite3_errmsg(cx_) << std::endl << "Query: " << qry;
         } else {
             int id = sqlite3_last_insert_rowid(cx_);
             std::vector<std::shared_ptr<LibraryRepository>> r;

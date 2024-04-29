@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <sqlite3.h>
-#include "LibraryRepository.h"
+// #include "LibraryRepository.h"
 
 class Database {
 private:
@@ -13,7 +13,7 @@ private:
     bool ok_;
     char* err_;
     sqlite3* cx_;
-    sqlite3_stmt* ptr;
+    sqlite3_stmt* ptr_;
 
 public:
 
@@ -23,7 +23,7 @@ public:
     void printHelp();
     void printAttr(std::string item);
 
-    void query(std::vector<std::shared_ptr<LibraryRepository>> &target, std::string from, std::string filter, std::string value, bool partialMatch, bool isTotal);
+    void query(std::string from, std::string filter, std::string value, bool partialMatch, bool isTotal);
 
     Book insertOrUpdate(const Book &book);
     Transaction insertOrUpdate(const Transaction &transaction);

@@ -1,6 +1,7 @@
 #ifndef LIBRARYREPOSITORY_H
 #define LIBRARYREPOSITORY_H
 
+#include "Database.h"
 #include <memory>
 #include <string>
 #include <sstream>
@@ -31,7 +32,8 @@ private:
 
 public:
 
-    Sanction() {}
+    Sanction() {};
+    Sanction(std::string endOfSanction, bool active, int memberId, int id);
     Sanction(int memberId, std::string endOfSanction):
     LibraryRepository(), memberId_(memberId), endOfSanction_(endOfSanction), isActive_(true)
     {};
@@ -48,15 +50,11 @@ public:
     std::string getEndOfSanction()  const {return endOfSanction_;};
     bool getIsActive() const {return isActive_;};
 
-    std::string toString() override {
-       std::ostringstream os;
-       os << "Sanction id: " << this->getId() << '\n'
-       << "On member: " << memberId_ << '\n'
-       << "----------" << '\n'
-       << '\t' << "End of sanction: " << endOfSanction_ << '\n'
-       << '\t' << "Is active: " << isActive_ << std::endl;
-       return os.str();
-    };
+    std::string toString() override;
+
+    std::string getUpdateQry() const;
+
+    std::string getInsertQry() const;
 };
 
 class Member : public LibraryRepository {
@@ -71,7 +69,8 @@ private:
 
 public:
 
-    Member() {}
+    Member() {};
+    Member(std::string name, std::string address, std::string email, std::string phone, std::string restrictedUntil, bool isActive, int id);
     Member(std::string name, std::string address, std::string email, std::string phone):
     LibraryRepository(), name_(name), address_(address), email_(email), phone_(phone)
     {};
@@ -92,18 +91,13 @@ public:
     std::string getRestrictedUntil() const {return restrictedUntil_;};
     bool getActive() const {return active_;};
 
-    std::string toString() override {
-       std::ostringstream os;
-       os << "Member id: " << this->getId() << '\n'
-       << "--------" << '\n'
-       << '\t' << "Name: " << name_ << '\n'
-       << '\t' << "Address: " << address_ << '\n'
-       << '\t' << "Email: " << email_ << '\n'
-       << '\t' << "Phone: " << phone_ << '\n'
-       << '\t' << "Current restriction: " << restrictedUntil_ << '\n'
-       << '\t' << "Active user: " << active_ << std::endl;
-       return os.str();
-    };
+    std::string toString() override;
+       
+
+    std::string getUpdateQry() const;
+
+    std::string getInsertQry() const;
+
 
 };
 
@@ -120,6 +114,7 @@ private:
 public:
 
     Book() {}
+    Book(std::string title, std::string author, std::string genre, std::string ISBN, int year, int available);
     Book(std::string title, std::string ISBN, int available):
     LibraryRepository(), title_(title), author_("null"), genre_("null"), ISBN_(ISBN), year_(0), available_(available)
     {};
@@ -143,18 +138,10 @@ public:
     int getYear() const {return year_;};
     int getAvailable() const {return available_;};
 
-    std::string toString() override {
-       std::ostringstream os;
-       os << "Book id: " << this->getId() << '\n'
-       << "--------" << '\n'
-       << '\t' << "ISBN: " << ISBN_ << '\n'
-       << '\t' << "Title: " << title_ << '\n'
-       << '\t' << "Author: " << author_ << '\n'
-       << '\t' << "Genre: " << genre_ << '\n'
-       << '\t' << "Year: " << year_ << '\n'
-       << '\t' << "Availavility: x" << available_ << std::endl;
-       return os.str();
-    };
+    std::string toString() override;
+    std::string getUpdateQry() const;
+    std::string getInsertQry() const;
+    static void execSelect(Database* db, bool isTotal);
 
 };
 
@@ -170,7 +157,8 @@ private:
 
 public:
 
-    Transaction() {}
+    Transaction() {};
+    Transaction(std::string transactionDate, std::string dueDate, std::string returningDate, bool isReturned, int bookId, int memberId, int id);
     Transaction(int bookId, int memberId, std::string transactionDate, std::string dueDate, std::string returningDate):
     LibraryRepository(), bookId_(bookId), memberId_(memberId), transactionDate_(transactionDate), dueDate_(dueDate), returningDate_(returningDate), isReturned_(false)
     {};
@@ -194,17 +182,11 @@ public:
     void setReturningDate(std::string s) { returningDate_ = s; };
     void setIsReturned(bool b) { isReturned_ = b; };
 
-    std::string toString() override {
-       std::ostringstream os;
-       os << "Member id: " << this->getId() << '\n'
-       << " Relation Member-Book -> " << bookId_ << " - " << memberId_ << '\n'
-       << " --------------------" << '\n'
-       << '\t' << "Transaction date: " << transactionDate_ << '\n'
-       << '\t' << "Due date: " << dueDate_ << '\n'
-       << '\t' << "Returning date: " << returningDate_ << '\n'
-       << '\t' << "Has been returned: " << isReturned_ << std::endl;
-       return os.str();
-    };
+    std::string toString() override;
+
+    std::string getUpdateQry() const;
+
+    std::string getInsertQry() const;
 };
 
 #endif
