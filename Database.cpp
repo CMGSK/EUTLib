@@ -164,13 +164,13 @@ void Database::query(std::vector<std::shared_ptr<LibraryRepository>> &target, st
             case 0: {
                 while (sqlite3_step(ptr_) == SQLITE_ROW){
                     std::shared_ptr<Book> book = std::make_shared<Book>(
-                        sqlite3_column_int(ptr_, 0),
                         reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 1)),
                         reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 2)),
                         reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 3)),
                         reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 4)),
                         sqlite3_column_int(ptr_, 5),
-                        sqlite3_column_int(ptr_, 6)
+                        sqlite3_column_int(ptr_, 6),
+                        sqlite3_column_int(ptr_, 0)
                     );
                     target.push_back(book);
                 }
@@ -179,13 +179,13 @@ void Database::query(std::vector<std::shared_ptr<LibraryRepository>> &target, st
             case 1: {
                 while (sqlite3_step(ptr_) == SQLITE_ROW){
                     std::shared_ptr<Member> member = std::make_shared<Member>(
-                        sqlite3_column_int(ptr_, 0),
                         reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 1)),
                         reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 2)),
                         reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 3)),
                         reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 4)),
-                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 5)),
-                        sqlite3_column_int(ptr_, 6)
+                        sqlite3_column_int(ptr_, 5),
+                        reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 6)),
+                        sqlite3_column_int(ptr_, 0)
                     );
                     target.push_back(member);
                 }
@@ -194,13 +194,13 @@ void Database::query(std::vector<std::shared_ptr<LibraryRepository>> &target, st
             case 2: {
                 while (sqlite3_step(ptr_) == SQLITE_ROW){
                     std::shared_ptr<Transaction> transaction = std::make_shared<Transaction>(
-                        sqlite3_column_int(ptr_, 0),
                         sqlite3_column_int(ptr_, 1),
                         sqlite3_column_int(ptr_, 2),
                         reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 3)),
                         reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 4)),
                         reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 5)),
-                        sqlite3_column_int(ptr_, 6)
+                        sqlite3_column_int(ptr_, 6),
+                        sqlite3_column_int(ptr_, 0)
                     );
                     target.push_back(transaction);
                 }
@@ -209,10 +209,10 @@ void Database::query(std::vector<std::shared_ptr<LibraryRepository>> &target, st
             case 3: {
                 while (sqlite3_step(ptr_) == SQLITE_ROW){
                     std::shared_ptr<Sanction> sanction = std::make_shared<Sanction>(
-                        sqlite3_column_int(ptr_, 0),
                         sqlite3_column_int(ptr_, 1),
                         reinterpret_cast<const char*>(sqlite3_column_text(ptr_, 2)),
-                        sqlite3_column_int(ptr_, 3)
+                        sqlite3_column_int(ptr_, 3),
+                        sqlite3_column_int(ptr_, 0)
                     );
                     target.push_back(sanction);
                 }
