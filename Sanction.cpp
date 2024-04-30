@@ -51,7 +51,7 @@ std::string Sanction::getInsertQry() const{
 std::string Sanction::getUpdateQry() const{
     std::ostringstream os;
     os << "UPDATE Sanctions SET ";
-    os << "is_active = " << isActive_ << ")";
+    os << "is_active = " << isActive_ << " ";
     os << "WHERE id = " << getId();
     return os.str();
 }

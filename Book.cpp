@@ -39,6 +39,10 @@ Book::Book(bool isUpdate){
     std::getline(std::cin, input);
     ISBN_ = input != "" ? input : "null";
     input = "";
+    std::cout << "Insert a year for the book. \n> ";
+    std::getline(std::cin, input);
+    ISBN_ = input != "" ? stoi(input) : -1;
+    input = "";
     std::cout << "Insert the ammount of books. \n> ";
     std::getline(std::cin, input);
     available_ = input != "" ? stoi(input) : 0;
@@ -61,13 +65,13 @@ std::string Book::getUpdateQry() const {
     std::ostringstream os;
     os << "UPDATE Books SET ";
     if (title_ != "")
-        os << "title = '" << title_ << "',";
+        os << "title = '" << title_ << "'";
     if (author_ != "")
-        os << "author = '" << author_ << "',";
+        os << ",author = '" << author_ << "'";
     if (genre_ != "")
-        os << "genre = '" << genre_ << "',";
+        os << ",genre = '" << genre_ << "'";
     if (year_)
-        os << "year = '" << year_ << "' ";
+        os << ",year = '" << year_ << "' ";
     os << "WHERE id = " << getId();
     return os.str();
 }

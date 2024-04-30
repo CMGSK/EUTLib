@@ -47,7 +47,8 @@ int main() {
                     break;
                 }
                 case 4: {
-                    selectionPath(db, flag, strcmp(command, "-a") == 0);
+                    int comp = strcmp(command, "-a");
+                    selectionPath(db, flag, comp==0);
                     break;
                 }
             }
@@ -72,45 +73,45 @@ void selectionPath(Database* db, std::string command, bool isTotal){
     std::vector<std::shared_ptr<LibraryRepository>> r;
     std::string filter;
     std::string value;
-    char partialMatch;
+    std::string partialMatch;
     std::string attribute = std::find_if(std::begin(from_case),
         std::end(from_case),
         [&command](auto e){
-            return e.second == flag_case.at(command);
+            return e.second == flag_case.at(command)-1;
         })->first;
+
     if(isTotal){
         db->query(r, attribute, "", "", false, true);
-        if (r.empty()) std::cout << "No results." << std::endl;
-    } 
-    else {
+    } else {
         std::cout << "Type the the attribute you will look for:\n>";
         db->printAttr(attribute);
         std::getline(std::cin, filter);
         std::cout << "Type the the value you want to check\n>";
         std::getline(std::cin, value);
         std::cout << "Do you want to include partial matches? (Y/N): ";
-        std::cin >> partialMatch;
-        db->query(r, attribute, filter, value, (partialMatch == 'Y' || partialMatch == 'y'), false);
-        if (r.empty()) std::cout << "No results." << std::endl;
-        else{
-            switch (flag_case.at(command)) {
-                case 1:
-                    for (auto item : r)
-                        std::static_pointer_cast<Book>(item)->toString();
-                    break;
-                case 2:
-                    for (auto item : r)
-                        std::static_pointer_cast<Member>(item)->toString();
-                    break;
-                case 3:
-                    for (auto item : r)
-                        std::static_pointer_cast<Transaction>(item)->toString();
-                    break;
-                case 4:
-                    for (auto item : r)
-                        std::static_pointer_cast<Sanction>(item)->toString();
-                    break;
-            }
+        std::getline(std::cin, partialMatch); 
+        db->query(r, attribute, filter, value, (partialMatch == "Y" || partialMatch == "y"), false);
+    }
+
+    if (r.empty()) std::cout << "No results." << std::endl;
+    else{
+        switch (flag_case.at(command)) {
+            case 1:
+                for (auto item : r)
+                    std::cout << std::static_pointer_cast<Book>(item)->toString();
+                break;
+            case 2:
+                for (auto item : r)
+                    std::cout << std::static_pointer_cast<Member>(item)->toString();
+                break;
+            case 3:
+                for (auto item : r)
+                    std::cout << std::static_pointer_cast<Transaction>(item)->toString();
+                break;
+            case 4:
+                for (auto item : r)
+                    std::cout << std::static_pointer_cast<Sanction>(item)->toString();
+                break;
         }
     }
 }
@@ -126,10 +127,11 @@ void deletionPath(Database* db, std::string command){
     std::cout << "Do you need to delete more than one item? (Y/N): ";
     std::cin >> bulk;
     if (bulk == 'Y' || bulk == 'y'){
-        std::cout << "Input all the IDs and type 'done' to submit.\n>";
+        std::cout << "Input all the IDs and type 'done' to submit.";
         std::vector<int> id;
         while (input != "done"){
             try{
+                std::cout << "\n>";
                 std::getline(std::cin, input);
                 id.push_back(atoi(input.c_str()));
             } catch (...) { 
@@ -137,7 +139,7 @@ void deletionPath(Database* db, std::string command){
                 continue;
             }
         }
-        db->deleteBulk(attribute, id);
+        if (db->deleteBulk(attribute, id)) std::cout << "Success. \n--------\n";
     } else {
         std::cout << "Input the target ID.\n>";
         try {
@@ -145,11 +147,9 @@ void deletionPath(Database* db, std::string command){
             std::cin.get();
             std::getline(std::cin, input);
             int id = stoi(input);
-            db->deleteSingle(attribute, id);
-            return;
+            if (db->deleteSingle(attribute, id)) std::cout << "Success. \n--------\n";
         } catch (...){
             std::cout << "Thats not a valid ID nor command.\n>";
-            return;
         }
     }
 }
@@ -191,25 +191,21 @@ void updatePath(Database* db, std::string command) {
             case 1: {
                 Book* book = new Book(true);
                 Book res = db->insertOrUpdate(*book);
-                std::cout << "-------------\nBook updated successfully.\n-------------\n\n" << std::endl;
                 return;
             }
             case 2: {
                 Member* member = new Member(true);
                 Member res = db->insertOrUpdate(*member);
-                std::cout << "-------------\nMember updated successfully.\n-------------\n\n" << std::endl;
                 return;
             }
             case 3: {
                 Transaction* transaction = new Transaction(true);
                 Transaction res = db->insertOrUpdate(*transaction);
-                std::cout << "-------------\nTransaction updated successfully.\n-------------\n\n" << std::endl;
                 return;
             }
             case 4: {
                 Sanction* sanction = new Sanction(true);
                 Sanction res = db->insertOrUpdate(*sanction);
-                std::cout << "-------------\nSanction updated successfully.\n-------------\n\n" << std::endl;
                 return;
             }
         }

@@ -49,17 +49,16 @@ std::string Member::getUpdateQry() const{
     std::ostringstream os;
     os << "UPDATE Members SET ";
     if (name_ != "")
-        os << "name = '" << name_ << "',";
+        os << "name = '" << name_ << "'";
     if (address_ != "")
-        os << "address = '" << address_ << "',";
+        os << ",address = '" << address_ << "'";
     if (email_ != "")
-        os << "email = '" << email_ << "',";
+        os << ",email = '" << email_ << "'";
     if (phone_ != "")
-        os << "phone = '" << phone_ << "', ";
+        os << ",phone = '" << phone_ << "'";
     if (restrictedUntil_ != "")
-        os << "restricted_until = '" << restrictedUntil_ << "', ";
-    if (active_)
-        os << "active = " << active_ << ")";
+        os << ",restricted_until = '" << restrictedUntil_ << "'";
+    os << "active = " << active_ << " ";
     os << "WHERE id = " << getId();
     return os.str();
 }

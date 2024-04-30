@@ -66,15 +66,15 @@ std::string Transaction::getUpdateQry() const{
     std::ostringstream os;
     os << "UPDATE Transactions SET ";
     if (bookId_ != -1)
-        os << "book_id = '" << bookId_ << "',";
+        os << "book_id = '" << bookId_ << "'";
     if (memberId_ != -1)
-        os << "member_id = '" << memberId_ << "',";
+        os << ",member_id = '" << memberId_ << "'";
     if (transactionDate_ != "")
-        os << "transaction_date = '" << transactionDate_ << "',";
+        os << ",transaction_date = '" << transactionDate_ << "'";
     if (dueDate_ != "")
-        os << "due_date = '" << dueDate_ << "', ";
+        os << ",due_date = '" << dueDate_ << "'";
     if (returningDate_ != "")
-        os << "returning_date = '" << returningDate_ << "' ";
+        os << ",returning_date = '" << returningDate_ << "' ";
     os << "WHERE id = " << getId();
     return os.str();
 }
