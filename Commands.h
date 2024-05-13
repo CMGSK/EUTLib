@@ -14,7 +14,8 @@ const std::unordered_map<std::string,int> flag_case{
    {"-b", 1},
    {"-m", 2},
    {"-t", 3},
-   {"-s", 4}
+   {"-s", 4},
+   {"-p", 5}
 };
 
 const std::unordered_map<std::string,int> from_case{
@@ -22,4 +23,5 @@ const std::unordered_map<std::string,int> from_case{
    {"members", 1},
    {"transactions", 2},
    {"sanctions", 3},
+   {"students", 4}
 };

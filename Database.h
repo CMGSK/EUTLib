@@ -10,6 +10,7 @@
 #include "Member.h"
 #include "Transaction.h"
 #include "Sanction.h"
+#include "Student.h"
 
 class Database {
 private:
@@ -33,6 +34,7 @@ public:
     Transaction insertOrUpdate(const Transaction &transaction);
     Member insertOrUpdate(const Member &member);
     Sanction insertOrUpdate(const Sanction &sanction);
+    Student insertOrUpdate(const Student &student);
 
     bool deleteSingle(std::string table, int id);
     bool deleteBulk(std::string table, std::vector<int> id);

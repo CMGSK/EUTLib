@@ -37,7 +37,17 @@ static const std::string sql = "CREATE TABLE IF NOT EXISTS Books (" \
             "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
             "member_id VARCHAR(80) NOT NULL," \
             "end_of_sanction VARCHAR(80) NOT NULL," \
-            "is_active BOOLEAN NOT NULL);";
+            "is_active BOOLEAN NOT NULL);" \
+        "CREATE TABLE IF NOT EXISTS Student (" \
+            "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
+            "name VARCHAR(80) NOT NULL," \
+            "subject VARCHAR(80)," \
+            "phone VARCHAR(80)," \
+            "email VARCHAR(80)," \
+            "promotion INT," \
+            "current_year INT," \
+            "avg_grade FLOAT," \
+            "active BOOLEAN NOT NULL);";
 
 // Initialization
 Database::Database(): err_(0), ok_(true){
@@ -64,6 +74,7 @@ void Database::printHelp(){
     std::cout << "Command to insert:" << std::endl;
     std::cout << "\t ins [-flag]" << std::endl;
     std::cout << "Flags:" << std::endl;
+    std::cout << "\t [-p] for students" << std::endl;
     std::cout << "\t [-b] for books" << std::endl;
     std::cout << "\t [-m] for members" << std::endl;
     std::cout << "\t [-t] for transactions" << std::endl;
@@ -72,6 +83,7 @@ void Database::printHelp(){
     std::cout << "Command to delete:" << std::endl;
     std::cout << "\t del [-flag]" << std::endl;
     std::cout << "Flags:" << std::endl;
+    std::cout << "\t [-p] for students" << std::endl;
     std::cout << "\t [-b] for books" << std::endl;
     std::cout << "\t [-m] for members" << std::endl;
     std::cout << "\t [-t] for transactions" << std::endl;
@@ -80,6 +92,7 @@ void Database::printHelp(){
     std::cout << "Command to update:" << std::endl;
     std::cout << "\t mod [-flag]" << std::endl;
     std::cout << "Flags:" << std::endl;
+    std::cout << "\t [-p] for students" << std::endl;
     std::cout << "\t [-b] for books" << std::endl;
     std::cout << "\t [-m] for members" << std::endl;
     std::cout << "\t [-t] for transactions" << std::endl;
@@ -90,6 +103,7 @@ void Database::printHelp(){
     std::cout << "Flags:" << std::endl;
     std::cout << "\t [-a] use it to avoid filter input (select all)" << std::endl;
     std::cout << "\t   ---------------------   " << std::endl;
+    std::cout << "\t [-p] for students" << std::endl;
     std::cout << "\t [-b] for books" << std::endl;
     std::cout << "\t [-m] for members" << std::endl;
     std::cout << "\t [-t] for transactions" << std::endl;
@@ -116,6 +130,10 @@ void Database::printAttr(std::string item){
             case 3: 
                 std::cout << "Sanction attributes:" << std::endl;
                 std::cout << "Member_id, end_of_sanction, is_active." << std::endl;
+                break;
+            case 4: 
+                std::cout << "Student attributes:" << std::endl;
+                std::cout << "" << std::endl;
                 break;
         }
     } catch (...) { std::cout << "That kind of item doesn't exist" << std::endl;}

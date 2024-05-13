@@ -112,6 +112,10 @@ void selectionPath(Database* db, std::string command, bool isTotal){
                 for (auto item : r)
                     std::cout << std::static_pointer_cast<Sanction>(item)->toString();
                 break;
+            case 5:
+                for (auto item : r)
+                    std::cout << std::static_pointer_cast<Student>(item)->toString();
+                break;
         }
     }
 }
@@ -181,6 +185,12 @@ void insertionPath(Database* db, std::string command) {
                 std::cout << "-------------\nSanction inserted successfully.\n-------------\n\n" << std::endl;
                 return;
             }
+            case 5: {
+                Student* student = new Student(false);
+                db->insertOrUpdate(*student);
+                std::cout << "-------------\nSanction inserted successfully.\n-------------\n\n" << std::endl;
+                return;
+            }
         }
     } catch (...) { std::cout << "Flag is not valid. If you need help, type -h."; }
 }
@@ -206,6 +216,11 @@ void updatePath(Database* db, std::string command) {
             case 4: {
                 Sanction* sanction = new Sanction(true);
                 Sanction res = db->insertOrUpdate(*sanction);
+                return;
+            }
+            case 5: {
+                Student* student = new Student(true);
+                Student res = db->insertOrUpdate(*student);
                 return;
             }
         }
